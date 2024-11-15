@@ -206,21 +206,21 @@ const Unishare: React.FC = () => {
         </div>
       </header>
 
-      <div className="container relative mx-auto px-4 pb-8 z-10">
-        <div className="p-4">
-          <h1 className="text-6xl font-bold text-center mb-6 text-purple-800">Unishare</h1>
+      <div className="container relative mx-auto px-4 pb-16 z-10">
+        <div className="p-8 rounded-lg">
+          <h1 className="text-6xl font-bold text-center mb-12 text-purple-800">Unishare</h1>
           
           <div className="max-w-2xl mx-auto mb-6">
             <div className="relative">
               <input
                 type="search"
                 placeholder="Buscar apartamentos..."
+                className="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 disabled
-                className="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50"
               />
               <button 
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-purple-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -229,7 +229,7 @@ const Unishare: React.FC = () => {
             </div>
           </div>
           
-          <div className="max-w-2xl mx-auto mb-6">
+          <div className="max-w-2xl mx-auto mb-12">
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className="flex items-center gap-2 text-purple-600 hover:text-purple-700 mb-4"
@@ -333,24 +333,24 @@ const Unishare: React.FC = () => {
             </div>
           </div>
 
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-purple-800 mb-4">Alojamientos destacados</h2>
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-purple-800 mb-6">Alojamientos destacados</h2>
             <Swiper
               navigation={true}
-              modules={[Navigation, Mousewheel, Autoplay]}
+              pagination={{ clickable: true }}
+              modules={[Navigation, Pagination, Mousewheel, Autoplay]}
               mousewheel={{
                 forceToAxis: true,
                 sensitivity: 1,
                 releaseOnEdges: true
               }}
+              spaceBetween={20}
+              slidesPerView={1}
+              loop={true}
               autoplay={{
                 delay: 5000,
                 disableOnInteraction: false,
-                pauseOnMouseEnter: true
               }}
-              loop={true}
-              spaceBetween={20}
-              slidesPerView={1}
               breakpoints={{
                 640: { slidesPerView: 2 },
                 768: { slidesPerView: 3 },
