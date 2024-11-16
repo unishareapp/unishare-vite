@@ -100,7 +100,25 @@ function App() {
         />
         <Route 
           path="/my-apartments" 
-          element={<MyApartments />} 
+          element={
+            <MyApartments />
+          } 
+        />
+        <Route 
+          path="/profile" 
+          element={
+            <Profile 
+              user={user}
+            />
+          } 
+        />
+        <Route 
+          path="/settings" 
+          element={
+            <Settings 
+              user={user}
+            />
+          } 
         />
       </Routes>
     </Router>

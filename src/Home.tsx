@@ -240,7 +240,8 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
 
       <div className="container relative mx-auto px-4 pb-8 z-10">
         <div className="p-4">
-          <h1 className="text-6xl font-bold text-center mb-6 text-purple-800">UniShare.app</h1>
+          <h1 className="text-6xl font-bold text-center mb-2 text-purple-800">UniShare.app</h1>
+          <p className="text-xl text-center mb-6 text-purple-600">¡Compartir es vivir!</p>
           
           <div className="max-w-2xl mx-auto mb-6">
             <form onSubmit={handleSearch} className="relative">
