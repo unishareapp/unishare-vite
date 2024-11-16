@@ -24,4 +24,27 @@
 
 .apartment-swiper .swiper-button-prev {
   left: 5px;
+}
+
+.modal-swiper .swiper-button-next,
+.modal-swiper .swiper-button-prev {
+  width: 30px;
+  height: 30px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  color: #6B46C1;
+}
+
+.modal-swiper .swiper-button-next:after,
+.modal-swiper .swiper-button-prev:after {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.modal-swiper .swiper-button-next {
+  right: 10px;
+}
+
+.modal-swiper .swiper-button-prev {
+  left: 10px;
 } 

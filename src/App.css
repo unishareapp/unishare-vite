@@ -6,3 +6,68 @@
 .scrollbar-hide::-webkit-scrollbar {
     display: none; /* Chrome, Safari, and Opera */
 }
+
+/* Personalizar flechas del slider de cards */
+.apartment-swiper .swiper-button-next,
+.apartment-swiper .swiper-button-prev {
+  width: 25px;  /* Ancho más pequeño */
+  height: 25px; /* Alto más pequeño */
+}
+
+.apartment-swiper .swiper-button-next:after,
+.apartment-swiper .swiper-button-prev:after {
+  font-size: 16px; /* Tamaño de flecha más pequeño */
+  font-weight: bold;
+  color: #7c3aed; /* Color morado para combinar con el tema */
+}
+
+.modal-swiper .swiper-button-next,
+.modal-swiper .swiper-button-prev {
+  width: 30px;
+  height: 30px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  color: #6B46C1;
+}
+
+.modal-swiper .swiper-button-next:after,
+.modal-swiper .swiper-button-prev:after {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.modal-swiper .swiper-button-next {
+  right: 10px;
+}
+
+.modal-swiper .swiper-button-prev {
+  left: 10px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s ease-out;
+}
