@@ -11,9 +11,10 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 interface ApartmentDetailProps {
+  apartments: Apartment[];
   likedApartments: number[];
   handleLike: (id: number) => void;
-  openChat: (apartment: Apartment, origin: string) => void;
+  openChat: (apartment: Apartment) => void;
 }
 
 interface Message {
@@ -23,7 +24,12 @@ interface Message {
   timestamp: Date;
 }
 
-const ApartmentDetail: React.FC<ApartmentDetailProps> = ({ likedApartments, handleLike, openChat }) => {
+const ApartmentDetail: React.FC<ApartmentDetailProps> = ({ 
+  apartments, 
+  likedApartments, 
+  handleLike, 
+  openChat 
+}) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();

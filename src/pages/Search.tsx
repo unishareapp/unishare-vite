@@ -9,12 +9,18 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 interface SearchProps {
+  apartments: Apartment[];
   likedApartments: number[];
   handleLike: (id: number) => void;
-  openChat: (apartment: Apartment, origin: string) => void;
+  openChat: (apartment: Apartment) => void;
 }
 
-const Search: React.FC<SearchProps> = ({ likedApartments, handleLike, openChat }) => {
+const Search: React.FC<SearchProps> = ({ 
+  apartments, 
+  likedApartments, 
+  handleLike, 
+  openChat 
+}) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('q') || '';
@@ -265,7 +271,7 @@ const Search: React.FC<SearchProps> = ({ likedApartments, handleLike, openChat }
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          openChat(apt, 'search');
+                          openChat(apt);
                         }}
                         className="bg-purple-600 text-white px-2 py-1 rounded text-xs hover:bg-purple-700 transition-colors flex items-center gap-1"
                       >
@@ -363,7 +369,7 @@ const Search: React.FC<SearchProps> = ({ likedApartments, handleLike, openChat }
                 <button
                   onClick={() => {
                     closeModal();
-                    openChat(selectedApartment, 'search');
+                    openChat(selectedApartment);
                   }}
                   className="text-purple-600 hover:text-purple-700 text-sm flex items-center gap-1"
                 >

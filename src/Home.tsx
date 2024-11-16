@@ -20,6 +20,9 @@ interface HomeProps {
   openChat: (apartment: Apartment) => void;
   user: User | null;
   handleLogout: () => void;
+  apartments: Apartment[];
+  messages: { [key: number]: Message[] };
+  onSendMessage: (apartmentId: number, text: string) => void;
 }
 
 // Añadir la interfaz Message que falta
@@ -30,7 +33,7 @@ interface Message {
   timestamp: Date;
 }
 
-const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user, handleLogout }) => {
+const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user, handleLogout, apartments, messages, onSendMessage }) => {
   const navigate = useNavigate();
   
   // Declarar todos los estados necesarios
@@ -38,7 +41,6 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
   const [selectedApartment, setSelectedApartment] = useState<Apartment | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [currentChatApartment, setCurrentChatApartment] = useState<Apartment | null>(null);
-  const [messages, setMessages] = useState<{ [key: number]: Message[] }>({});
   const [currentMessage, setCurrentMessage] = useState("");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 3000]);
@@ -66,35 +68,8 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
 
   const handleSendMessage = (apartmentId: number) => {
     if (!currentMessage.trim()) return;
-
-    const newMessage = {
-      id: Date.now(),
-      text: currentMessage,
-      sender: 'user' as const,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => ({
-      ...prev,
-      [apartmentId]: [...(prev[apartmentId] || []), newMessage]
-    }));
-
+    onSendMessage(apartmentId, currentMessage);
     setCurrentMessage('');
-
-    // Simular respuesta del host
-    setTimeout(() => {
-      const hostResponse = {
-        id: Date.now(),
-        text: "¡Hola! Gracias por tu mensaje. ¿En qué puedo ayudarte?",
-        sender: 'host' as const,
-        timestamp: new Date()
-      };
-
-      setMessages(prev => ({
-        ...prev,
-        [apartmentId]: [...(prev[apartmentId] || []), hostResponse]
-      }));
-    }, 1000);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

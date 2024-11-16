@@ -12,7 +12,7 @@ interface LoginProps {
   onLogin: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Login: React.FC<LoginProps> = ({ setUser }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,17 +27,16 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setError('');
     setSuccess('');
 
-    // Validar credenciales
-    if (email === 'admin' && password === 'admin') {
-      setSuccess('¡Inicio de sesión exitoso!');
-      onLogin(); // Llamar a la función que actualiza el estado del usuario
-      // Redirigir después de 1.5 segundos
-      setTimeout(() => {
-        navigate('/');
-      }, 1500);
-    } else {
-      setError('Credenciales incorrectas');
-    }
+    // Simular login exitoso
+    const mockUser: User = {
+      name: "Usuario de Prueba",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=test",
+      isLoggedIn: true
+    };
+    
+    setUser(mockUser);
+    // Redirigir al usuario a la página principal
+    navigate('/');
   };
 
   const handleSendMessage = () => {
@@ -69,7 +68,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   return (
     <div className="min-h-screen bg-white relative">
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-6xl font-bold text-center mb-12 text-purple-800">Unishare</h1>
+        <h1 className="text-6xl font-bold text-center mb-2 text-purple-800">Unishare</h1>
+        <p className="text-xl text-center mb-6 text-purple-600">¡Compartir es vivir!</p>
         
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-sm p-8 border border-gray-200">
           <h2 className="text-2xl font-bold text-center mb-6 text-purple-800">Iniciar Sesión</h2>

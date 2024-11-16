@@ -3,46 +3,70 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './Home';
 import Login from './Login';
 import Favorites from './pages/Favorites';
-import { Apartment } from './types';
+import { Apartment, Message, User } from './types';
 import Search from './pages/Search';
 import ApartmentDetail from './pages/ApartmentDetail';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import MyApartments from './components/MyApartments';
-
-interface User {
-  name: string;
-  avatar: string;
-  isLoggedIn: boolean;
-}
+import MyChats from './MyChats';
+import { apartments as initialApartments } from './data';
 
 function App() {
+  const [user, setUser] = useState<User>({
+    name: "Usuario de Prueba",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=test",
+    isLoggedIn: true
+  });
+  
   const [likedApartments, setLikedApartments] = useState<number[]>([]);
   const [currentChatApartment, setCurrentChatApartment] = useState<Apartment | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [apartments] = useState(initialApartments);
+  const [messages, setMessages] = useState<{ [key: number]: Message[] }>({});
 
   const handleLike = (id: number) => {
-    setLikedApartments(prev =>
+    setLikedApartments(prev => 
       prev.includes(id) ? prev.filter(aptId => aptId !== id) : [...prev, id]
     );
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+  };
+
+  const handleSendMessage = (apartmentId: number, text: string) => {
+    const newMessage: Message = {
+      id: Date.now(),
+      text,
+      sender: 'user',
+      timestamp: new Date()
+    };
+
+    setMessages(prev => ({
+      ...prev,
+      [apartmentId]: [...(prev[apartmentId] || []), newMessage]
+    }));
+
+    // Simular respuesta del host
+    setTimeout(() => {
+      const hostResponse: Message = {
+        id: Date.now() + 1,
+        text: "¡Gracias por tu mensaje! Te responderé lo antes posible.",
+        sender: 'host',
+        timestamp: new Date()
+      };
+
+      setMessages(prev => ({
+        ...prev,
+        [apartmentId]: [...(prev[apartmentId] || []), hostResponse]
+      }));
+    }, 1000);
   };
 
   const openChat = (apartment: Apartment) => {
     setCurrentChatApartment(apartment);
     setIsChatOpen(true);
-  };
-
-  const handleLogin = () => {
-    setUser({
-      name: 'Admin',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
-      isLoggedIn: true
-    });
-  };
-
-  const handleLogout = () => {
-    setUser(null);
   };
 
   return (
@@ -57,31 +81,32 @@ function App() {
               openChat={openChat}
               user={user}
               handleLogout={handleLogout}
+              apartments={apartments}
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              currentChatApartment={currentChatApartment}
+              isChatOpen={isChatOpen}
+              setIsChatOpen={setIsChatOpen}
             />
           } 
         />
+        <Route path="/login" element={<Login setUser={setUser} />} />
         <Route 
           path="/favorites" 
           element={
             <Favorites 
+              apartments={apartments.filter(apt => likedApartments.includes(apt.id))}
               likedApartments={likedApartments}
               handleLike={handleLike}
-              openChat={openChat}
+              user={user}
             />
           } 
-        />
-        <Route 
-          path="/login" 
-          element={
-            <Login 
-              onLogin={handleLogin}
-            />
-          }
         />
         <Route 
           path="/search" 
           element={
             <Search 
+              apartments={apartments}
               likedApartments={likedApartments}
               handleLike={handleLike}
               openChat={openChat}
@@ -92,31 +117,24 @@ function App() {
           path="/apartment/:id" 
           element={
             <ApartmentDetail 
+              apartments={apartments}
               likedApartments={likedApartments}
               handleLike={handleLike}
               openChat={openChat}
             />
           } 
         />
+        <Route path="/profile" element={<Profile user={user} />} />
+        <Route path="/settings" element={<Settings user={user} />} />
+        <Route path="/my-apartments" element={<MyApartments user={user} />} />
         <Route 
-          path="/my-apartments" 
+          path="/my-chats" 
           element={
-            <MyApartments />
-          } 
-        />
-        <Route 
-          path="/profile" 
-          element={
-            <Profile 
+            <MyChats 
               user={user}
-            />
-          } 
-        />
-        <Route 
-          path="/settings" 
-          element={
-            <Settings 
-              user={user}
+              messages={messages}
+              apartments={apartments}
+              onSendMessage={handleSendMessage}
             />
           } 
         />

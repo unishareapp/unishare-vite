@@ -1,20 +1,7 @@
-interface User {
-  id: number;
+export interface User {
   name: string;
   avatar: string;
-}
-
-export interface Apartment {
-  id: number;
-  title: string;
-  category: string;
-  price: number;
-  location: string;
-  size: string;
-  description: string;
-  features: string[];
-  images: string[];
-  user: User;
+  isLoggedIn: boolean;
 }
 
 export interface Message {
@@ -22,4 +9,21 @@ export interface Message {
   text: string;
   sender: 'user' | 'host';
   timestamp: Date;
+}
+
+export interface Apartment {
+  id: number;
+  title: string;
+  category: string;
+  description: string;
+  price: number;
+  location: string;
+  size: string;
+  images: string[];
+  features: string[];
+  duration: string;
+  user: {
+    name: string;
+    avatar: string;
+  };
 } 
