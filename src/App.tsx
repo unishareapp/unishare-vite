@@ -71,74 +71,73 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route 
-          path="/" 
-          element={
-            <Home 
-              likedApartments={likedApartments}
-              handleLike={handleLike}
-              openChat={openChat}
-              user={user}
-              handleLogout={handleLogout}
-              apartments={apartments}
-              messages={messages}
-              onSendMessage={handleSendMessage}
-              currentChatApartment={currentChatApartment}
-              isChatOpen={isChatOpen}
-              setIsChatOpen={setIsChatOpen}
-            />
-          } 
-        />
-        <Route path="/login" element={<Login setUser={setUser} />} />
-        <Route 
-          path="/favorites" 
-          element={
-            <Favorites 
-              apartments={apartments.filter(apt => likedApartments.includes(apt.id))}
-              likedApartments={likedApartments}
-              handleLike={handleLike}
-              user={user}
-            />
-          } 
-        />
-        <Route 
-          path="/search" 
-          element={
-            <Search 
-              apartments={apartments}
-              likedApartments={likedApartments}
-              handleLike={handleLike}
-              openChat={openChat}
-            />
-          } 
-        />
-        <Route 
-          path="/apartment/:id" 
-          element={
-            <ApartmentDetail 
-              apartments={apartments}
-              likedApartments={likedApartments}
-              handleLike={handleLike}
-              openChat={openChat}
-            />
-          } 
-        />
-        <Route path="/profile" element={<Profile user={user} />} />
-        <Route path="/settings" element={<Settings user={user} />} />
-        <Route path="/my-apartments" element={<MyApartments user={user} />} />
-        <Route 
-          path="/my-chats" 
-          element={
-            <MyChats 
-              user={user}
-              messages={messages}
-              apartments={apartments}
-              onSendMessage={handleSendMessage}
-            />
-          } 
-        />
-      </Routes>
+      <div className="min-h-screen">
+        <Routes>
+          <Route 
+            path="/" 
+            element={
+              <Home 
+                likedApartments={likedApartments}
+                handleLike={handleLike}
+                openChat={openChat}
+                user={user}
+                handleLogout={handleLogout}
+                apartments={apartments}
+                messages={messages}
+                onSendMessage={handleSendMessage}
+              />
+            } 
+          />
+          <Route path="/login" element={<Login setUser={setUser} />} />
+          <Route 
+            path="/favorites" 
+            element={
+              <Favorites 
+                apartments={apartments.filter(apt => likedApartments.includes(apt.id))}
+                likedApartments={likedApartments}
+                handleLike={handleLike}
+                user={user}
+              />
+            } 
+          />
+          <Route 
+            path="/search" 
+            element={
+              <Search 
+                apartments={apartments}
+                likedApartments={likedApartments}
+                handleLike={handleLike}
+                openChat={openChat}
+              />
+            } 
+          />
+          <Route 
+            path="/apartment/:id" 
+            element={
+              <ApartmentDetail 
+                apartments={apartments}
+                likedApartments={likedApartments}
+                handleLike={handleLike}
+                openChat={openChat}
+              />
+            } 
+          />
+          <Route path="/profile" element={<Profile user={user} />} />
+          <Route path="/settings" element={<Settings user={user} />} />
+          <Route path="/my-apartments" element={<MyApartments user={user} />} />
+          <Route 
+            path="/my-chats" 
+            element={
+              <MyChats 
+                user={user}
+                messages={messages}
+                apartments={apartments}
+                onSendMessage={handleSendMessage}
+              />
+            } 
+          />
+        </Routes>
+      </div>
     </Router>
   );
 }

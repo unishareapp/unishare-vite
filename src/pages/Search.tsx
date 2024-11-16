@@ -167,17 +167,25 @@ const Search: React.FC<SearchProps> = ({
                   <div className="space-y-1.5">
                     <input
                       type="number"
-                      value={priceRange[0]}
-                      onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                      value={priceRange[0] === 0 ? '' : priceRange[0]}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                        setPriceRange([value, priceRange[1]]);
+                      }}
                       className="w-full p-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder="Precio mínimo"
+                      min="0"
                     />
                     <input
                       type="number"
-                      value={priceRange[1]}
-                      onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                      value={priceRange[1] === 0 ? '' : priceRange[1]}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                        setPriceRange([priceRange[0], value]);
+                      }}
                       className="w-full p-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder="Precio máximo"
+                      min="0"
                     />
                   </div>
                 </div>
