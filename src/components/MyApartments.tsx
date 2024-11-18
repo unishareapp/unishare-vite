@@ -24,11 +24,28 @@ const MyApartments: React.FC = () => {
       title: "Apartamento moderno cerca del campus",
       price: 800,
       location: "Calle Universidad 123",
-      images: ["/apartment1.jpg"],
+      images: [
+        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.0",
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.0"
+      ],
       description: "Hermoso apartamento totalmente amueblado",
       rooms: 3,
       bathrooms: 2,
       size: 90
+    },
+    {
+      id: 2,
+      title: "Estudio céntrico renovado",
+      price: 600,
+      location: "Plaza Mayor 45",
+      images: [
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.0",
+        "https://images.unsplash.com/photo-1484154218962-a197022b5858?ixlib=rb-4.0.0"
+      ],
+      description: "Estudio moderno y luminoso en el centro",
+      rooms: 1,
+      bathrooms: 1,
+      size: 45
     }
   ]);
 

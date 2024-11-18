@@ -15,14 +15,18 @@ export interface Apartment {
 export const apartments: Apartment[] = [
   {
     id: 1,
-    title: "Apartamento céntrico",
-    category: "Piso compartido",
-    description: "Hermoso apartamento en el centro de la ciudad",
+    title: "Apartamento Moderno",
+    category: "2 Bedroom",
+    description: "Moderno apartamento completamente amueblado",
     price: 800,
-    location: "Centro de la ciudad",
-    size: "60m²",
-    images: ["https://picsum.photos/seed/apt1/800/600"],
-    features: ["WiFi", "Amueblado"],
+    location: "Centro ciudad",
+    size: "75m²",
+    images: [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.0",
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.0",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?ixlib=rb-4.0.0"
+    ],
+    features: ["Amueblado", "WiFi", "Cocina equipada"],
     duration: "12 meses",
     user: {
       name: "Juan Pérez",
@@ -31,14 +35,18 @@ export const apartments: Apartment[] = [
   },
   {
     id: 2,
-    title: "Estudio moderno",
-    category: "Estudio",
-    description: "Estudio completamente equipado",
+    title: "Estudio Luminoso",
+    category: "Studio",
+    description: "Estudio reformado con mucha luz natural",
     price: 600,
-    location: "Campus universitario",
-    size: "35m²",
-    images: ["https://picsum.photos/seed/apt2/800/600"],
-    features: ["WiFi", "Amueblado", "Gimnasio"],
+    location: "Zona universitaria",
+    size: "40m²",
+    images: [
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.0",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?ixlib=rb-4.0.0",
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.0"
+    ],
+    features: ["WiFi", "Lavandería", "Terraza"],
     duration: "9 meses",
     user: {
       name: "María García",

@@ -22,20 +22,30 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    // Simular login exitoso
-    const mockUser: User = {
-      name: "Usuario de Prueba",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=test",
-      isLoggedIn: true
-    };
-    
-    setUser(mockUser);
-    navigate('/');
+    try {
+      // Simular login exitoso
+      const mockUser: User = {
+        name: "Usuario de Prueba",
+        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=test",
+        isLoggedIn: true
+      };
+      
+      setSuccess('¡Inicio de sesión exitoso!');
+      
+      // Esperar 1.5 segundos antes de redireccionar
+      setTimeout(() => {
+        setUser(mockUser);
+        navigate('/');
+      }, 1500);
+      
+    } catch (err) {
+      setError('Error al iniciar sesión. Por favor, inténtalo de nuevo.');
+    }
   };
 
   const handleSendMessage = () => {
@@ -65,22 +75,22 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
   };
 
   return (
-    <div className="min-h-screen bg-white relative">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-6xl font-bold text-center mb-2 text-purple-800">Unishare</h1>
-        <p className="text-xl text-center mb-6 text-purple-600">¡Compartir es vivir!</p>
-        
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-sm p-8 border border-gray-200">
           <h2 className="text-2xl font-bold text-center mb-6 text-purple-800">Iniciar Sesión</h2>
           
-          {/* Mensajes de error y éxito */}
+          {/* Mensajes de error y éxito con animación */}
           {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm animate-fadeIn">
               {error}
             </div>
           )}
           {success && (
-            <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm">
+            <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm animate-fadeIn flex items-center justify-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
               {success}
             </div>
           )}
