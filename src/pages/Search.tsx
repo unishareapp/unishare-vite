@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { FaHeart, FaRegHeart, FaComments } from 'react-icons/fa';
-import { Apartment } from '../types';
+import { Apartment, Message, User } from '../types';
 import { apartments } from '../data';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
@@ -13,13 +13,19 @@ interface SearchProps {
   likedApartments: number[];
   handleLike: (id: number) => void;
   openChat: (apartment: Apartment) => void;
+  onSendMessage: (apartmentId: number, text: string) => void;
+  messages: { [key: number]: Message[] };
+  user: User | null;
 }
 
 const Search: React.FC<SearchProps> = ({ 
   apartments, 
   likedApartments, 
   handleLike, 
-  openChat 
+  openChat, 
+  onSendMessage, 
+  messages, 
+  user 
 }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -97,6 +103,14 @@ const Search: React.FC<SearchProps> = ({
         searchParams: location.search
       }
     });
+  };
+
+  const handleChatOpen = (apartment: Apartment) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    openChat(apartment);
   };
 
   return (
@@ -279,7 +293,7 @@ const Search: React.FC<SearchProps> = ({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          openChat(apt);
+                          handleChatOpen(apt);
                         }}
                         className="bg-purple-600 text-white px-2 py-1 rounded text-xs hover:bg-purple-700 transition-colors flex items-center gap-1"
                       >
@@ -297,7 +311,14 @@ const Search: React.FC<SearchProps> = ({
 
       {/* Modal de detalle */}
       {selectedApartment && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              closeModal();
+            }
+          }}
+        >
           <div className="bg-white rounded-lg w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto relative animate-slideUp">
             <button 
               onClick={closeModal}
@@ -375,10 +396,7 @@ const Search: React.FC<SearchProps> = ({
                   <span>Ver más</span>
                 </button>
                 <button
-                  onClick={() => {
-                    closeModal();
-                    openChat(selectedApartment);
-                  }}
+                  onClick={() => handleChatOpen(selectedApartment)}
                   className="text-purple-600 hover:text-purple-700 text-sm flex items-center gap-1"
                 >
                   <FaComments className="text-sm" />

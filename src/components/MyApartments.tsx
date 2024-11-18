@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaEdit, FaTrash, FaArrowLeft } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaArrowLeft, FaPlus } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 interface Apartment {
@@ -75,8 +75,12 @@ const MyApartments: React.FC = () => {
 
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Mis Apartamentos</h1>
-          <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
-            + Añadir nuevo apartamento
+          <button
+            onClick={() => navigate('/add-apartment')}
+            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+          >
+            <FaPlus />
+            <span>Añadir nuevo apartamento</span>
           </button>
         </div>
 

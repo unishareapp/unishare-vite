@@ -11,21 +11,22 @@ import Settings from './pages/Settings';
 import MyApartments from './components/MyApartments';
 import MyChats from './MyChats';
 import { apartments as initialApartments } from './data';
+import Register from './Register';
+import AddApartment from './pages/AddApartment';
 
 function App() {
-  const [user, setUser] = useState<User>({
-    name: "Usuario de Prueba",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=test",
-    isLoggedIn: true
-  });
+  const [user, setUser] = useState<User | null>(null);
   
   const [likedApartments, setLikedApartments] = useState<number[]>([]);
   const [currentChatApartment, setCurrentChatApartment] = useState<Apartment | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [apartments] = useState(initialApartments);
+  const [apartments, setApartments] = useState(initialApartments);
   const [messages, setMessages] = useState<{ [key: number]: Message[] }>({});
 
   const handleLike = (id: number) => {
+    if (!user) {
+      return;
+    }
     setLikedApartments(prev => 
       prev.includes(id) ? prev.filter(aptId => aptId !== id) : [...prev, id]
     );
@@ -36,6 +37,11 @@ function App() {
   };
 
   const handleSendMessage = (apartmentId: number, text: string) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
     const newMessage: Message = {
       id: Date.now(),
       text,
@@ -65,8 +71,33 @@ function App() {
   };
 
   const openChat = (apartment: Apartment) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    
+    // Inicializar el chat si no existe
+    if (!messages[apartment.id]) {
+      setMessages(prev => ({
+        ...prev,
+        [apartment.id]: []
+      }));
+    }
+    
     setCurrentChatApartment(apartment);
     setIsChatOpen(true);
+  };
+
+  const handleAddApartment = (newApartment: Omit<Apartment, 'id' | 'user'>) => {
+    const apartmentWithId: Apartment = {
+      ...newApartment,
+      id: apartments.length + 1,
+      user: {
+        name: user!.name,
+        avatar: user!.avatar
+      }
+    };
+    setApartments(prev => [...prev, apartmentWithId]);
   };
 
   return (
@@ -89,6 +120,7 @@ function App() {
             } 
           />
           <Route path="/login" element={<Login setUser={setUser} />} />
+          <Route path="/register" element={<Register setUser={setUser} />} />
           <Route 
             path="/favorites" 
             element={
@@ -108,6 +140,9 @@ function App() {
                 likedApartments={likedApartments}
                 handleLike={handleLike}
                 openChat={openChat}
+                onSendMessage={handleSendMessage}
+                messages={messages}
+                user={user}
               />
             } 
           />
@@ -119,12 +154,23 @@ function App() {
                 likedApartments={likedApartments}
                 handleLike={handleLike}
                 openChat={openChat}
+                onSendMessage={handleSendMessage}
+                messages={messages}
+                user={user}
               />
             } 
           />
           <Route path="/profile" element={<Profile user={user} />} />
           <Route path="/settings" element={<Settings user={user} />} />
-          <Route path="/my-apartments" element={<MyApartments user={user} />} />
+          <Route 
+            path="/my-apartments" 
+            element={
+              <MyApartments 
+                user={user} 
+                apartments={apartments}
+              />
+            } 
+          />
           <Route 
             path="/my-chats" 
             element={
@@ -133,6 +179,15 @@ function App() {
                 messages={messages}
                 apartments={apartments}
                 onSendMessage={handleSendMessage}
+              />
+            } 
+          />
+          <Route 
+            path="/add-apartment" 
+            element={
+              <AddApartment 
+                user={user}
+                onAddApartment={handleAddApartment}
               />
             } 
           />

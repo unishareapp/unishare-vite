@@ -1,7 +1,13 @@
-
 import { Button, Navbar, NavbarBrand, NavbarCollapse, NavbarLink, NavbarToggle } from "flowbite-react";
+import { useNavigate } from "react-router-dom";
 
-export default function Nav() {
+interface NavProps {
+  user: User | null;
+}
+
+export default function Nav({ user }: NavProps) {
+  const navigate = useNavigate();
+
   return (
     <Navbar fluid rounded>
       <NavbarBrand href="https://flowbite-react.com">
@@ -9,7 +15,15 @@ export default function Nav() {
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Flowbite React</span>
       </NavbarBrand>
       <div className="flex md:order-2">
-        <Button>Get started</Button>
+        {user ? (
+          <Button onClick={() => navigate('/profile')}>
+            {user.name}
+          </Button>
+        ) : (
+          <Button onClick={() => navigate('/login')}>
+            Iniciar sesión
+          </Button>
+        )}
         <NavbarToggle />
       </div>
       <NavbarCollapse>

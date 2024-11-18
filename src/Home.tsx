@@ -78,8 +78,21 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
     }
   };
 
-  // Actualizar la función openChat en el componente
+  // Modificar la función handleLike para verificar autenticación
+  const handleLikeWithAuth = (id: number) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    handleLike(id);
+  };
+
+  // Modificar la función handleChatOpen para verificar autenticación
   const handleChatOpen = (apartment: Apartment, origin: 'main' | 'detail') => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     setCurrentChatApartment(apartment);
     setIsChatOpen(true);
     setChatOrigin(origin);
@@ -395,7 +408,7 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleLike(apt.id);
+                          handleLikeWithAuth(apt.id);
                         }}
                         className="text-lg text-red-500 hover:text-red-600 transition-colors"
                       >
@@ -419,10 +432,17 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
           </div>
 
           {selectedApartment && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn">
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setSelectedApartment(null);
+                }
+              }}
+            >
               <div className="bg-white rounded-lg w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto relative animate-slideUp">
                 <button 
-                  onClick={closeModal}
+                  onClick={() => setSelectedApartment(null)}
                   className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 z-10"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -521,7 +541,14 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
           )}
 
           {isChatOpen && currentChatApartment && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn">
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setIsChatOpen(false);
+                }
+              }}
+            >
               <div className="bg-white rounded-lg w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto relative animate-slideUp">
                 <div className="bg-purple-600 text-white p-4 rounded-t-lg flex justify-between items-center">
                   <div className="flex items-center gap-3">

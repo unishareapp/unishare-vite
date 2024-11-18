@@ -28,7 +28,10 @@ const ApartmentDetail: React.FC<ApartmentDetailProps> = ({
   apartments, 
   likedApartments, 
   handleLike, 
-  openChat 
+  openChat,
+  onSendMessage,
+  messages,
+  user
 }) => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -36,48 +39,28 @@ const ApartmentDetail: React.FC<ApartmentDetailProps> = ({
   const apartment = apartments.find(apt => apt.id === Number(id));
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [currentMessage, setCurrentMessage] = useState("");
-  const [messages, setMessages] = useState<{ [key: number]: Message[] }>({});
   const [isImageSliderOpen, setIsImageSliderOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Añadir las funciones necesarias para el chat
-  const handleSendMessage = (apartmentId: number) => {
-    if (!currentMessage.trim()) return;
+  const handleChatOpen = (apartment: Apartment) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    openChat(apartment);
+  };
 
-    const newMessage = {
-      id: Date.now(),
-      text: currentMessage,
-      sender: 'user' as const,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => ({
-      ...prev,
-      [apartmentId]: [...(prev[apartmentId] || []), newMessage]
-    }));
-
-    setCurrentMessage('');
-
-    // Simular respuesta del host
-    setTimeout(() => {
-      const hostResponse = {
-        id: Date.now(),
-        text: "¡Hola! Gracias por tu mensaje. ¿En qué puedo ayudarte?",
-        sender: 'host' as const,
-        timestamp: new Date()
-      };
-
-      setMessages(prev => ({
-        ...prev,
-        [apartmentId]: [...(prev[apartmentId] || []), hostResponse]
-      }));
-    }, 1000);
+  const handleSendMessage = (text: string) => {
+    if (apartment) {
+      onSendMessage(apartment.id, text);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage(apartment.id);
+      handleSendMessage(currentMessage);
+      setCurrentMessage('');
     }
   };
 
@@ -166,14 +149,20 @@ const ApartmentDetail: React.FC<ApartmentDetailProps> = ({
 
               <div className="flex gap-4">
                 <button
-                  onClick={() => handleLike(apartment.id)}
+                  onClick={() => {
+                    if (!user) {
+                      navigate('/login');
+                      return;
+                    }
+                    handleLike(apartment.id);
+                  }}
                   className="flex items-center gap-2 text-red-500 hover:text-red-600"
                 >
                   {likedApartments.includes(apartment.id) ? <FaHeart /> : <FaRegHeart />}
                   <span>Guardar</span>
                 </button>
                 <button
-                  onClick={() => setIsChatOpen(true)}
+                  onClick={() => handleChatOpen(apartment)}
                   className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 flex items-center gap-2"
                 >
                   <FaComments />
@@ -219,7 +208,14 @@ const ApartmentDetail: React.FC<ApartmentDetailProps> = ({
 
       {/* Chat Modal */}
       {isChatOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsChatOpen(false);
+            }
+          }}
+        >
           <div className="bg-white rounded-lg w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto relative animate-slideUp">
             <div className="bg-purple-600 text-white p-4 rounded-t-lg flex justify-between items-center">
               <div className="flex items-center gap-3">
@@ -276,7 +272,10 @@ const ApartmentDetail: React.FC<ApartmentDetailProps> = ({
                   className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
                 <button 
-                  onClick={() => handleSendMessage(apartment.id)}
+                  onClick={() => {
+                    handleSendMessage(currentMessage);
+                    setCurrentMessage('');
+                  }}
                   className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
                 >
                   Enviar
@@ -289,7 +288,14 @@ const ApartmentDetail: React.FC<ApartmentDetailProps> = ({
 
       {/* Slider Modal de Imágenes */}
       {isImageSliderOpen && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center animate-fadeIn">
+        <div 
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center animate-fadeIn"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsImageSliderOpen(false);
+            }
+          }}
+        >
           <button 
             onClick={() => setIsImageSliderOpen(false)}
             className="absolute right-4 top-4 text-white hover:text-gray-300 z-10 transition-colors"

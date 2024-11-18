@@ -35,7 +35,6 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
     };
     
     setUser(mockUser);
-    // Redirigir al usuario a la página principal
     navigate('/');
   };
 
@@ -116,9 +115,10 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
             <div className="flex justify-between items-center">
               <button
                 type="button"
+                onClick={() => navigate('/register')}
                 className="text-sm text-purple-600 hover:text-purple-700"
               >
-                ¿Olvidaste tu contraseña?
+                ¿No tienes cuenta? Regístrate
               </button>
               <button
                 type="submit"
