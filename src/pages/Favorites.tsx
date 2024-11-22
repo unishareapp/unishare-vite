@@ -28,8 +28,8 @@ const Favorites: React.FC<FavoritesProps> = ({ likedApartments, handleLike, open
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-8 text-purple-800">
+      <div className="container mx-auto px-4 py-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-purple-800">
           Alojamientos Guardados
         </h1>
 
@@ -44,38 +44,36 @@ const Favorites: React.FC<FavoritesProps> = ({ likedApartments, handleLike, open
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {favoriteApartments.map(apt => (
               <div 
                 key={apt.id}
-                className="bg-white rounded-lg overflow-hidden border border-gray-200"
+                className="bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-shadow"
               >
-                <div className="h-48 overflow-hidden">
+                <div className="h-32 sm:h-36 overflow-hidden relative">
                   <img 
                     src={apt.images[0]} 
                     alt={apt.title}
                     className="w-full h-full object-cover"
                   />
+                  <button
+                    onClick={() => handleLike(apt.id)}
+                    className="absolute top-2 right-2 text-red-500 hover:text-red-600 transition-colors bg-white rounded-full p-1.5 shadow-sm"
+                  >
+                    <FaHeart className="text-sm" />
+                  </button>
                 </div>
-                <div className="p-4">
-                  <h2 className="text-lg font-semibold mb-2">{apt.title}</h2>
-                  <p className="text-gray-600 text-sm mb-2">{apt.category}</p>
-                  <p className="text-lg font-bold text-purple-600 mb-4">${apt.price}/mes</p>
-                  <div className="flex justify-between items-center">
-                    <button
-                      onClick={() => handleLike(apt.id)}
-                      className="text-xl text-red-500 hover:text-red-600 transition-colors"
-                    >
-                      <FaHeart />
-                    </button>
-                    <button
-                      onClick={() => openChat(apt)}
-                      className="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700 transition-colors flex items-center gap-1"
-                    >
-                      <FaComments />
-                      <span>Chatear</span>
-                    </button>
-                  </div>
+                <div className="p-2 sm:p-3">
+                  <h2 className="font-semibold text-sm sm:text-base line-clamp-1">{apt.title}</h2>
+                  <p className="text-gray-600 text-xs sm:text-sm mb-1">{apt.category}</p>
+                  <p className="text-purple-600 font-bold text-sm sm:text-base mb-2">{apt.price}€/mes</p>
+                  <button
+                    onClick={() => openChat(apt)}
+                    className="w-full bg-purple-600 text-white px-2 py-1.5 rounded text-xs sm:text-sm hover:bg-purple-700 transition-colors flex items-center justify-center gap-1"
+                  >
+                    <FaComments className="text-xs" />
+                    <span>Chatear</span>
+                  </button>
                 </div>
               </div>
             ))}

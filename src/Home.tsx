@@ -124,119 +124,117 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="bg-white">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex gap-4">
-            {user ? (
-              <div className="relative">
-                <button 
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center gap-2 hover:bg-gray-50 p-2 rounded-lg transition-colors"
-                >
-                  <img 
-                    src={user.avatar} 
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                  <span className="text-gray-700">{user.name}</span>
-                  <svg 
-                    className={`w-4 h-4 text-gray-500 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
+      <header className="bg-white z-40">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex justify-center items-center gap-6">
+            {/* Icono de inicio */}
+            <button
+              onClick={() => navigate('/')}
+              className="text-purple-600 hover:text-purple-700 transition-colors"
+            >
+              <FaHome className="text-xl" />
+            </button>
 
-                {/* Menú desplegable */}
-                {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50 animate-fadeIn">
-                    <button 
-                      onClick={() => {
-                        navigate('/profile');
-                        setIsUserMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    >
-                      <FaUser className="text-purple-600" />
-                      <span>Tu perfil</span>
-                    </button>
-                    <button 
-                      onClick={() => {
-                        navigate('/my-apartments');
-                        setIsUserMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    >
-                      <FaHome className="text-purple-600" />
-                      <span>Mis apartamentos</span>
-                    </button>
-                    <button 
-                      onClick={() => {
-                        navigate('/my-chats');
-                        setIsUserMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    >
-                      <FaComments className="text-purple-600" />
-                      <span>Mis chats</span>
-                    </button>
-                    <button 
-                      onClick={() => {
-                        navigate('/settings');
-                        setIsUserMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    >
-                      <FaCog className="text-purple-600" />
-                      <span>Ajustes</span>
-                    </button>
-                    <div className="border-t border-gray-100 my-1"></div>
-                    <button 
-                      onClick={() => {
-                        handleLogout();
-                        setIsUserMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                    >
-                      <FaSignOutAlt className="text-red-600" />
-                      <span>Cerrar sesión</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <button 
-                onClick={() => navigate('/login')} 
-                className="flex items-center gap-2 text-purple-600 hover:text-purple-700"
-              >
-                <FaUser className="text-xl" />
-                <span>Iniciar sesión</span>
-              </button>
-            )}
-            <button 
+            {/* Icono de favoritos */}
+            <button
               onClick={() => navigate('/favorites')}
-              className="flex items-center gap-2 text-purple-600 hover:text-purple-700"
+              className="text-purple-600 hover:text-purple-700 transition-colors"
             >
               <FaHeart className="text-xl" />
-              <span>Favoritos</span>
             </button>
+
+            {/* Icono de chats */}
+            <button
+              onClick={() => navigate('/my-chats')}
+              className="text-purple-600 hover:text-purple-700 transition-colors"
+            >
+              <FaComments className="text-xl" />
+            </button>
+
+            {/* Icono de perfil */}
+            <div className="relative">
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="w-8 h-8 rounded-full overflow-hidden hover:ring-2 hover:ring-purple-500 transition-all"
+              >
+                <img
+                  src={user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=default'}
+                  alt="Perfil"
+                  className="w-full h-full object-cover"
+                />
+              </button>
+              
+              {/* Menú desplegable con animación */}
+              {isUserMenuOpen && (
+                <div 
+                  className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50 animate-slideDown"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {user ? (
+                    <>
+                      <div className="px-4 py-2 border-b border-gray-100">
+                        <p className="font-medium text-gray-800">{user.name}</p>
+                        <p className="text-sm text-gray-500">Ver perfil</p>
+                      </div>
+                      <button
+                        onClick={() => navigate('/profile')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50"
+                      >
+                        Mi Perfil
+                      </button>
+                      <button
+                        onClick={() => navigate('/my-apartments')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50"
+                      >
+                        Mis Apartamentos
+                      </button>
+                      <button
+                        onClick={() => navigate('/settings')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50"
+                      >
+                        Configuración
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                      >
+                        Cerrar Sesión
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => navigate('/login')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50"
+                      >
+                        Iniciar Sesión
+                      </button>
+                      <button
+                        onClick={() => navigate('/register')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50"
+                      >
+                        Registrarse
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
       <div className="container relative mx-auto px-4 pb-8 z-10">
-        <div className="p-4">
-          <h1 className="text-6xl font-bold text-center mb-2 text-purple-800">UniShare.app</h1>
-          <p className="text-xl text-center mb-6 text-purple-600">¡Compartir es vivir!</p>
+        <div className="p-2 sm:p-4">
+          <h1 className="text-4xl sm:text-6xl font-bold text-center mb-2 text-purple-800">UniShare.app</h1>
+          <p className="text-lg sm:text-xl text-center mb-4 sm:mb-6 text-purple-600">¡Compartir es vivir!</p>
           
-          <div className="max-w-2xl mx-auto mb-6">
+          <div className="max-w-2xl mx-auto mb-4 sm:mb-6">
             <form onSubmit={handleSearch} className="relative">
               <input
                 type="search"
                 placeholder="Buscar apartamentos..."
-                className="w-full px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
               />
               <button 
                 type="submit"
@@ -249,7 +247,7 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
             </form>
           </div>
           
-          <div className="max-w-2xl mx-auto mb-6">
+          <div className="max-w-2xl mx-auto mb-4 sm:mb-6">
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className="flex items-center gap-2 text-purple-600 hover:text-purple-700 mb-4"
@@ -273,7 +271,7 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
               }`}
             >
               <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <h3 className="font-semibold mb-2">Tipo de habitación</h3>
                     <select
@@ -369,14 +367,16 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
                 pauseOnMouseEnter: true
               }}
               loop={true}
-              spaceBetween={20}
-              slidesPerView={1}
+              spaceBetween={10}
+              slidesPerView={1.2}
               breakpoints={{
-                640: { slidesPerView: 2 },
-                768: { slidesPerView: 3 },
-                1024: { slidesPerView: 4 },
+                480: { slidesPerView: 1.5, spaceBetween: 15 },
+                640: { slidesPerView: 2, spaceBetween: 20 },
+                768: { slidesPerView: 2.5 },
+                1024: { slidesPerView: 3 },
+                1280: { slidesPerView: 4 },
               }}
-              className="apartment-swiper"
+              className="apartment-swiper px-2 sm:px-0"
             >
               {featuredApartments.map(apt => (
                 <SwiperSlide key={apt.id}>
@@ -433,79 +433,94 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
 
           {selectedApartment && (
             <div 
-              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
               onClick={(e) => {
                 if (e.target === e.currentTarget) {
                   setSelectedApartment(null);
                 }
               }}
             >
-              <div className="bg-white rounded-lg w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto relative animate-slideUp">
-                <button 
-                  onClick={() => setSelectedApartment(null)}
-                  className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 z-10"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+              <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden animate-fadeIn">
+                {/* Contenedor del Swiper */}
+                <div className="relative h-48 sm:h-64">
+                  <button
+                    onClick={() => setSelectedApartment(null)}
+                    className="absolute right-2 top-2 z-10 bg-black bg-opacity-50 text-white p-1.5 rounded-full hover:bg-opacity-70"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
 
-                <div className="p-6">
                   <Swiper
-                    navigation={true}
-                    modules={[Navigation]}
-                    loop={true}
-                    className="h-64 mb-6 modal-swiper"
+                    navigation
+                    pagination
+                    modules={[Navigation, Pagination]}
+                    className="h-full w-full"
                   >
                     {selectedApartment.images.map((image, index) => (
                       <SwiperSlide key={index}>
-                        <img 
-                          src={image} 
-                          alt={`${selectedApartment.title} - imagen ${index + 1}`}
+                        <img
+                          src={image}
+                          alt={`Imagen ${index + 1} de ${selectedApartment.title}`}
                           className="w-full h-full object-cover"
                         />
                       </SwiperSlide>
                     ))}
                   </Swiper>
+                </div>
 
-                  <div className="flex items-center gap-3 mb-4">
-                    <img 
-                      src={selectedApartment.user.avatar} 
-                      alt={selectedApartment.user.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
+                {/* Contenido del modal */}
+                <div className="p-4 overflow-y-auto max-h-[calc(90vh-12rem)]">
+                  <div className="flex justify-between items-start gap-4 mb-3">
                     <div>
-                      <p className="font-semibold">{selectedApartment.user.name}</p>
-                      <p className="text-sm text-gray-500">Propietario</p>
+                      <h3 className="text-lg font-semibold text-gray-900">{selectedApartment.title}</h3>
+                      <p className="text-purple-600 font-medium">{selectedApartment.price}€/mes</p>
+                    </div>
+                    <button
+                      onClick={() => handleLikeWithAuth(selectedApartment.id)}
+                      className="text-red-500 hover:text-red-600"
+                    >
+                      {likedApartments.includes(selectedApartment.id) ? (
+                        <FaHeart className="text-xl" />
+                      ) : (
+                        <FaRegHeart className="text-xl" />
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Grid de detalles */}
+                  <div className="grid grid-cols-2 gap-3 mb-3 text-sm">
+                    <div>
+                      <p className="font-medium text-gray-700">Ubicación:</p>
+                      <p className="text-gray-600">{selectedApartment.location}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-700">Tamaño:</p>
+                      <p className="text-gray-600">{selectedApartment.size}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-700">Duración:</p>
+                      <p className="text-gray-600">{selectedApartment.duration}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-700">Categoría:</p>
+                      <p className="text-gray-600">{selectedApartment.category}</p>
                     </div>
                   </div>
 
-                  <h2 className="text-2xl font-bold mb-4">{selectedApartment.title}</h2>
-                  <p className="text-xl font-semibold text-purple-600 mb-4">{selectedApartment.price}€/mes</p>
-                  
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div>
-                      <p className="font-semibold">Ubicación:</p>
-                      <p>{selectedApartment.location}</p>
-                    </div>
-                    <div>
-                      <p className="font-semibold">Tamaño:</p>
-                      <p>{selectedApartment.size}</p>
-                    </div>
+                  <div className="mb-3">
+                    <p className="font-medium text-gray-700 text-sm mb-1">Descripción:</p>
+                    <p className="text-sm text-gray-600">{selectedApartment.description}</p>
                   </div>
 
-                  <div className="mb-6">
-                    <p className="font-semibold mb-2">Descripción:</p>
-                    <p className="text-gray-600">{selectedApartment.description}</p>
-                  </div>
-
-                  <div className="mb-6">
-                    <p className="font-semibold mb-2">Características:</p>
-                    <div className="flex flex-wrap gap-2">
+                  <div>
+                    <p className="font-medium text-gray-700 text-sm mb-1">Características:</p>
+                    <div className="flex flex-wrap gap-1.5">
                       {selectedApartment.features.map((feature, index) => (
                         <span 
                           key={index}
-                          className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm"
+                          className="bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full text-xs"
                         >
                           {feature}
                         </span>
@@ -513,25 +528,13 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
                     </div>
                   </div>
 
-                  <div className="flex gap-4 justify-end">
+                  {/* Botones de acción */}
+                  <div className="flex gap-3 justify-end mt-4 pt-3 border-t">
                     <button
-                      onClick={() => handleViewDetails(selectedApartment.id)}
-                      className="text-purple-600 hover:text-purple-700 text-sm flex items-center gap-1"
+                      onClick={() => handleChatOpen(selectedApartment, 'detail')}
+                      className="text-purple-600 hover:text-purple-700 text-xs flex items-center gap-1"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      <span>Ver más</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        closeModal();
-                        handleChatOpen(selectedApartment, 'detail');
-                      }}
-                      className="text-purple-600 hover:text-purple-700 text-sm flex items-center gap-1"
-                    >
-                      <FaComments className="text-sm" />
+                      <FaComments className="text-xs" />
                       <span>Chatear</span>
                     </button>
                   </div>
@@ -541,15 +544,8 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
           )}
 
           {isChatOpen && currentChatApartment && (
-            <div 
-              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
-              onClick={(e) => {
-                if (e.target === e.currentTarget) {
-                  setIsChatOpen(false);
-                }
-              }}
-            >
-              <div className="bg-white rounded-lg w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto relative animate-slideUp">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn p-4">
+              <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto relative animate-slideUp">
                 <div className="bg-purple-600 text-white p-4 rounded-t-lg flex justify-between items-center">
                   <div className="flex items-center gap-3">
                     <button 
@@ -581,7 +577,7 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
                   </button>
                 </div>
                 
-                <div className="flex-1 p-6 h-[calc(90vh-180px)] overflow-y-auto">
+                <div className="flex-1 p-3 sm:p-6 h-[60vh] sm:h-[calc(90vh-180px)] overflow-y-auto">
                   {messages[currentChatApartment.id]?.length ? (
                     <div className="space-y-4">
                       {messages[currentChatApartment.id].map((message) => (

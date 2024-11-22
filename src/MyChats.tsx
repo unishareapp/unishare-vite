@@ -13,6 +13,7 @@ const MyChats: React.FC<MyChatsProps> = ({ user, messages, apartments, onSendMes
   const navigate = useNavigate();
   const [selectedChat, setSelectedChat] = useState<any>(null);
   const [currentMessage, setCurrentMessage] = useState('');
+  const [showChatList, setShowChatList] = useState(true);
 
   // Filtrar solo los apartamentos que tienen mensajes
   const activeChats = apartments.filter(apt => messages[apt.id]?.length > 0);
@@ -28,13 +29,27 @@ const MyChats: React.FC<MyChatsProps> = ({ user, messages, apartments, onSendMes
       <header className="bg-white shadow">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate('/')}
-              className="text-gray-600 hover:text-gray-800"
-            >
-              <FaArrowLeft className="text-xl" />
-            </button>
-            <h1 className="text-2xl font-bold text-purple-800">Mis Chats</h1>
+            {selectedChat && !showChatList ? (
+              <button
+                onClick={() => {
+                  setShowChatList(true);
+                  setSelectedChat(null);
+                }}
+                className="text-gray-600 hover:text-gray-800 md:hidden"
+              >
+                <FaArrowLeft className="text-xl" />
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate('/')}
+                className="text-gray-600 hover:text-gray-800"
+              >
+                <FaArrowLeft className="text-xl" />
+              </button>
+            )}
+            <h1 className="text-2xl font-bold text-purple-800">
+              {selectedChat && !showChatList ? selectedChat.title : 'Mis Chats'}
+            </h1>
           </div>
         </div>
       </header>
@@ -42,12 +57,17 @@ const MyChats: React.FC<MyChatsProps> = ({ user, messages, apartments, onSendMes
       <div className="container mx-auto px-4 py-6">
         <div className="bg-white rounded-lg shadow">
           <div className="grid md:grid-cols-3 h-[calc(100vh-200px)]">
-            {/* Lista de chats */}
-            <div className="border-r border-gray-200 overflow-y-auto">
+            {/* Lista de chats - oculta en móvil cuando se selecciona un chat */}
+            <div className={`${
+              selectedChat && !showChatList ? 'hidden' : 'block'
+            } md:block border-r border-gray-200 overflow-y-auto`}>
               {activeChats.map(apt => (
                 <button
                   key={apt.id}
-                  onClick={() => setSelectedChat(apt)}
+                  onClick={() => {
+                    setSelectedChat(apt);
+                    setShowChatList(false);
+                  }}
                   className={`w-full p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors border-b border-gray-100 ${
                     selectedChat?.id === apt.id ? 'bg-purple-50' : ''
                   }`}
@@ -59,16 +79,18 @@ const MyChats: React.FC<MyChatsProps> = ({ user, messages, apartments, onSendMes
                   />
                   <div className="flex-1 text-left">
                     <h3 className="font-semibold text-gray-800">{apt.title}</h3>
-                    <p className="text-sm text-gray-500">
-                      {messages[apt.id]?.[messages[apt.id].length - 1]?.text.slice(0, 30)}...
+                    <p className="text-sm text-gray-500 line-clamp-1">
+                      {messages[apt.id]?.[messages[apt.id].length - 1]?.text}
                     </p>
                   </div>
                 </button>
               ))}
             </div>
 
-            {/* Área de chat */}
-            <div className="col-span-2 flex flex-col">
+            {/* Área de chat - visible en móvil solo cuando se selecciona un chat */}
+            <div className={`${
+              !selectedChat || showChatList ? 'hidden' : 'block'
+            } md:block col-span-2 flex flex-col`}>
               {selectedChat ? (
                 <>
                   <div className="p-4 border-b border-gray-200">

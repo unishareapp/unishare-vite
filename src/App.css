@@ -25,9 +25,9 @@
 .modal-swiper .swiper-button-prev {
   width: 30px;
   height: 30px;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(0, 0, 0, 0.5);
   border-radius: 50%;
-  color: #6B46C1;
+  color: white;
 }
 
 .modal-swiper .swiper-button-next:after,
@@ -55,11 +55,9 @@
 
 @keyframes slideUp {
   from {
-    opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(100%);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -69,5 +67,172 @@
 }
 
 .animate-slideUp {
-  animation: slideUp 0.4s ease-out;
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+@media (max-width: 640px) {
+  .swiper-button-next,
+  .swiper-button-prev {
+    display: none !important;
+  }
+  
+  .modal-swiper .swiper-button-next {
+    right: 5px;
+  }
+  
+  .modal-swiper .swiper-button-prev {
+    left: 5px;
+  }
+  
+  .modal-swiper .swiper-button-next,
+  .modal-swiper .swiper-button-prev {
+    width: 25px;
+    height: 25px;
+  }
+  
+  .modal-swiper .swiper-button-next:after,
+  .modal-swiper .swiper-button-prev:after {
+    font-size: 12px;
+  }
+
+  .modal-filter {
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
+  }
+
+  .modal-filter.open {
+    transform: translateY(0);
+  }
+}
+
+.apartment-swiper {
+  padding-bottom: 40px !important;
+}
+
+.modal-swiper .swiper-button-next,
+.modal-swiper .swiper-button-prev {
+  color: white;
+  text-shadow: 0 0 3px rgba(0,0,0,0.5);
+}
+
+/* Ajustar tamaño de las flechas del Swiper */
+.swiper-button-next,
+.swiper-button-prev {
+  width: 25px !important;
+  height: 25px !important;
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  font-size: 14px !important;
+}
+
+/* Hacer el modal más compacto en móviles */
+@media (max-width: 640px) {
+  .modal-swiper .swiper-button-next,
+  .modal-swiper .swiper-button-prev {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .modal-swiper .swiper-button-next:after,
+  .modal-swiper .swiper-button-prev:after {
+    font-size: 12px !important;
+  }
+}
+
+/* Mejorar la legibilidad del texto */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Asegurar que el modal siempre esté por encima */
+.modal-overlay {
+  z-index: 50;
+}
+
+/* Refinamiento de la animación del modal */
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: scale(0.95); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Estilo para el menú desplegable */
+.dropdown-menu {
+  transform-origin: top right;
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Sombra suave para el header */
+header {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.2s ease-out forwards;
+}
+
+/* Para el texto truncado en los chats */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.map-modal {
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

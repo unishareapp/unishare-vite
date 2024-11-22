@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { FaHeart, FaRegHeart, FaComments } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaComments, FaFilter, FaHome } from 'react-icons/fa';
 import { Apartment, Message, User } from '../types';
 import { apartments } from '../data';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -31,6 +31,7 @@ const Search: React.FC<SearchProps> = ({
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('q') || '';
   const [selectedApartment, setSelectedApartment] = useState<Apartment | null>(null);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   
   // Inicializar filtros desde URL
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || "");
@@ -115,226 +116,360 @@ const Search: React.FC<SearchProps> = ({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="fixed top-4 left-4 z-10">
-        <button
-          onClick={() => navigate('/')}
-          className="bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors flex items-center gap-2"
-        >
-          <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-          </svg>
-          <span className="text-purple-600">Inicio</span>
-        </button>
-      </div>
-
-      <div className="container mx-auto px-4 pt-20 pb-12">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-purple-800">
-            Resultados para: "{searchQuery}"
-          </h1>
+      <div className="container mx-auto px-2 sm:px-4 py-4">
+        {/* Botón de volver al inicio - visible en todas las pantallas */}
+        <div className="mb-4">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-purple-600 hover:text-purple-700 transition-colors p-2 rounded-lg hover:bg-purple-50"
+          >
+            <FaHome className="text-lg" />
+            <span className="text-sm font-medium">Volver al inicio</span>
+          </button>
         </div>
 
-        <div className="flex gap-8">
-          {/* Panel de filtros - más estrecho y compacto */}
-          <div className="w-56 flex-shrink-0">
-            <div className="bg-white rounded-lg shadow p-4 sticky top-4">
-              <h2 className="font-semibold mb-6 text-lg">Filtros</h2>
+        {/* Grid principal con sidebar y contenido */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* Sidebar de filtros para desktop */}
+          <div className="hidden sm:block w-64 shrink-0">
+            <div className="bg-white rounded-lg shadow-sm p-4 sticky top-4">
+              <h3 className="font-semibold mb-4 text-gray-700">Filtros</h3>
               
-              <div className="space-y-6">
+              <div className="space-y-4">
+                {/* Categoría */}
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">
-                    Tipo de habitación
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Tipo de alojamiento
                   </label>
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full p-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full p-2 text-sm border rounded-md"
                   >
-                    <option value="">Todas</option>
+                    <option value="">Todos</option>
                     <option value="Studio">Estudio</option>
-                    <option value="1 Bedroom">1 Habitación</option>
-                    <option value="2 Bedroom">2 Habitaciones</option>
-                    <option value="3 Bedroom">3 Habitaciones</option>
+                    <option value="Habitación">Habitación</option>
+                    <option value="Piso completo">Piso completo</option>
                   </select>
                 </div>
 
+                {/* Ubicación */}
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Ubicación
                   </label>
                   <select
                     value={selectedLocation}
                     onChange={(e) => setSelectedLocation(e.target.value)}
-                    className="w-full p-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full p-2 text-sm border rounded-md"
                   >
-                    <option value="">Todas las ubicaciones</option>
+                    <option value="">Todas</option>
                     {locations.map(location => (
                       <option key={location} value={location}>{location}</option>
                     ))}
                   </select>
                 </div>
 
+                {/* Rango de precio */}
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">
-                    Rango de precio
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Precio máximo: {priceRange[1]}€
                   </label>
-                  <div className="space-y-1.5">
-                    <input
-                      type="number"
-                      value={priceRange[0] === 0 ? '' : priceRange[0]}
-                      onChange={(e) => {
-                        const value = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
-                        setPriceRange([value, priceRange[1]]);
-                      }}
-                      className="w-full p-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      placeholder="Precio mínimo"
-                      min="0"
-                    />
-                    <input
-                      type="number"
-                      value={priceRange[1] === 0 ? '' : priceRange[1]}
-                      onChange={(e) => {
-                        const value = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
-                        setPriceRange([priceRange[0], value]);
-                      }}
-                      className="w-full p-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      placeholder="Precio máximo"
-                      min="0"
-                    />
-                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="3000"
+                    value={priceRange[1]}
+                    onChange={(e) => setPriceRange([0, Number(e.target.value)])}
+                    className="w-full"
+                  />
                 </div>
 
+                {/* Características */}
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Características
                   </label>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     {allFeatures.map(feature => (
-                      <label key={feature} className="flex items-center text-sm">
+                      <label key={feature} className="flex items-center gap-2">
                         <input
                           type="checkbox"
                           checked={selectedFeatures.includes(feature)}
-                          onChange={() => {
-                            setSelectedFeatures(prev =>
-                              prev.includes(feature)
-                                ? prev.filter(f => f !== feature)
-                                : [...prev, feature]
-                            )
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedFeatures([...selectedFeatures, feature]);
+                            } else {
+                              setSelectedFeatures(selectedFeatures.filter(f => f !== feature));
+                            }
                           }}
-                          className="mr-2 h-4 w-4"
+                          className="rounded text-purple-600"
                         />
-                        {feature}
+                        <span className="text-sm text-gray-600">{feature}</span>
                       </label>
                     ))}
                   </div>
                 </div>
 
-                {/* Botón de aplicar filtros */}
-                <button
-                  onClick={applyFilters}
-                  className="w-full mt-6 text-purple-600 hover:text-purple-700 text-sm border border-purple-600 px-4 py-2 rounded-lg hover:bg-purple-50 transition-colors flex items-center justify-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  <span>Realizar nueva búsqueda</span>
-                </button>
+                {/* Botones de acción */}
+                <div className="flex gap-2 pt-4">
+                  <button
+                    onClick={applyFilters}
+                    className="flex-1 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 text-sm"
+                  >
+                    Aplicar
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedCategory("");
+                      setSelectedLocation("");
+                      setPriceRange([0, 3000]);
+                      setSelectedFeatures([]);
+                      applyFilters();
+                    }}
+                    className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 text-sm"
+                  >
+                    Limpiar
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Resultados */}
+          {/* Contenido principal */}
           <div className="flex-1">
-            {filteredResults.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500">No se encontraron resultados</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredResults.map(apt => (
-                  <div 
-                    key={apt.id}
-                    className="bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer transition-transform hover:scale-105 h-full flex flex-col"
-                    onClick={() => handleApartmentClick(apt)}
+            {/* Barra de búsqueda y botón de filtros móvil */}
+            <div className="bg-white rounded-lg shadow-sm p-3 mb-4 flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Buscar apartamentos..."
+                className="flex-1 p-2 text-sm border rounded-md"
+                value={searchQuery}
+                onChange={(e) => {
+                  const newSearchParams = new URLSearchParams(searchParams);
+                  newSearchParams.set('q', e.target.value);
+                  navigate({ search: newSearchParams.toString() });
+                }}
+              />
+              <button
+                onClick={() => setIsFilterModalOpen(true)}
+                className="sm:hidden bg-purple-600 text-white p-2 rounded-md hover:bg-purple-700"
+                aria-label="Abrir filtros"
+              >
+                <FaFilter className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Grid de resultados */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredResults.map((apartment) => (
+                <div 
+                  key={apartment.id}
+                  className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => handleApartmentClick(apartment)}
+                >
+                  <Swiper
+                    navigation={true}
+                    modules={[Navigation]}
+                    loop={true}
+                    className="h-40 sm:h-48"
                   >
-                    <div className="h-40 flex-shrink-0">
-                      <img 
-                        src={apt.images[0]} 
-                        alt={apt.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="p-3 flex-grow">
-                      <h3 className="font-semibold text-base mb-1">{apt.title}</h3>
-                      <p className="text-gray-600 text-xs mb-1">{apt.location}</p>
-                      <p className="text-purple-600 font-bold text-sm">{apt.price}€/mes</p>
-                      <p className="text-gray-500 text-xs mb-1">Duración: {apt.duration}</p>
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {apt.features.slice(0, 3).map((feature, index) => (
-                          <span 
-                            key={index}
-                            className="bg-purple-100 text-purple-800 text-xs px-1.5 py-0.5 rounded-full"
-                          >
-                            {feature}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="bg-gray-50 p-2 flex justify-between items-center">
+                    {apartment.images.map((image, index) => (
+                      <SwiperSlide key={index}>
+                        <img 
+                          src={image} 
+                          alt={apartment.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+
+                  <div className="p-3">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-base font-semibold line-clamp-1">{apartment.title}</h3>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleLike(apt.id);
+                          handleLike(apartment.id);
                         }}
-                        className="text-lg text-red-500 hover:text-red-600 transition-colors"
+                        className="text-purple-600 hover:text-purple-700"
                       >
-                        {likedApartments.includes(apt.id) ? <FaHeart /> : <FaRegHeart />}
+                        {likedApartments.includes(apartment.id) ? (
+                          <FaHeart className="text-lg" />
+                        ) : (
+                          <FaRegHeart className="text-lg" />
+                        )}
                       </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleChatOpen(apt);
-                        }}
-                        className="bg-purple-600 text-white px-2 py-1 rounded text-xs hover:bg-purple-700 transition-colors flex items-center gap-1"
-                      >
-                        <FaComments className="text-sm" />
-                        <span>Chatear</span>
-                      </button>
+                    </div>
+                    
+                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">{apartment.description}</p>
+                    
+                    <div className="flex justify-between items-center">
+                      <p className="text-purple-600 font-semibold">{apartment.price}€/mes</p>
+                      <p className="text-sm text-gray-500">{apartment.location}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+
+        {/* Modal de filtros para móvil */}
+        {isFilterModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 sm:hidden">
+            <div className="bg-white w-full h-full sm:h-auto sm:rounded-t-xl fixed bottom-0 p-4 animate-slideUp">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-semibold text-gray-700">Filtros</h3>
+                <button
+                  onClick={() => setIsFilterModalOpen(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Tipo de alojamiento
+                  </label>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full p-2 text-sm border rounded-md"
+                  >
+                    <option value="">Todos</option>
+                    <option value="Studio">Estudio</option>
+                    <option value="Habitación">Habitación</option>
+                    <option value="Piso completo">Piso completo</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Ubicación
+                  </label>
+                  <select
+                    value={selectedLocation}
+                    onChange={(e) => setSelectedLocation(e.target.value)}
+                    className="w-full p-2 text-sm border rounded-md"
+                  >
+                    <option value="">Todas las ubicaciones</option>
+                    {locations.map((location) => (
+                      <option key={location} value={location}>
+                        {location}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Rango de precio
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={priceRange[0]}
+                      onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                      className="w-full p-2 text-sm border rounded-md"
+                      placeholder="Min"
+                    />
+                    <span>-</span>
+                    <input
+                      type="number"
+                      value={priceRange[1]}
+                      onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                      className="w-full p-2 text-sm border rounded-md"
+                      placeholder="Max"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Características
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {allFeatures.map((feature) => (
+                      <label key={feature} className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={selectedFeatures.includes(feature)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedFeatures([...selectedFeatures, feature]);
+                            } else {
+                              setSelectedFeatures(selectedFeatures.filter(f => f !== feature));
+                            }
+                          }}
+                          className="rounded text-purple-600"
+                        />
+                        <span className="text-sm">{feature}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-4 border-t">
+                  <button
+                    onClick={() => {
+                      applyFilters();
+                      setIsFilterModalOpen(false);
+                    }}
+                    className="flex-1 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700"
+                  >
+                    Aplicar filtros
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Resetear filtros
+                      setSelectedCategory("");
+                      setSelectedLocation("");
+                      setPriceRange([0, 3000]);
+                      setSelectedFeatures([]);
+                      setIsFilterModalOpen(false);
+                    }}
+                    className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50"
+                  >
+                    Limpiar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Modal de detalle */}
       {selectedApartment && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn p-2 sm:p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               closeModal();
             }
           }}
         >
-          <div className="bg-white rounded-lg w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto relative animate-slideUp">
+          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto relative animate-slideUp">
             <button 
               onClick={closeModal}
-              className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 z-10"
+              className="absolute right-2 top-2 z-10 bg-black bg-opacity-50 text-white p-1.5 rounded-full hover:bg-opacity-70"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            <div className="p-6">
+            <div className="p-3 sm:p-4">
               <Swiper
                 navigation={true}
                 modules={[Navigation]}
                 loop={true}
-                className="h-64 mb-6 modal-swiper"
+                className="h-48 sm:h-56 mb-4 modal-swiper"
               >
                 {selectedApartment.images.map((image, index) => (
                   <SwiperSlide key={index}>
@@ -347,36 +482,38 @@ const Search: React.FC<SearchProps> = ({
                 ))}
               </Swiper>
 
-              <h2 className="text-2xl font-bold mb-4">{selectedApartment.title}</h2>
-              <p className="text-xl font-semibold text-purple-600 mb-4">{selectedApartment.price}€/mes</p>
+              <h2 className="text-lg sm:text-xl font-bold mb-2">{selectedApartment.title}</h2>
+              <p className="text-base sm:text-lg font-semibold text-purple-600 mb-3">
+                {selectedApartment.price}€/mes
+              </p>
               
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
                 <div>
                   <p className="font-semibold">Ubicación:</p>
-                  <p>{selectedApartment.location}</p>
+                  <p className="text-gray-600">{selectedApartment.location}</p>
                 </div>
                 <div>
                   <p className="font-semibold">Tamaño:</p>
-                  <p>{selectedApartment.size}</p>
+                  <p className="text-gray-600">{selectedApartment.size}</p>
                 </div>
                 <div>
                   <p className="font-semibold">Duración:</p>
-                  <p>{selectedApartment.duration}</p>
+                  <p className="text-gray-600">{selectedApartment.duration}</p>
                 </div>
               </div>
 
-              <div className="mb-6">
-                <p className="font-semibold mb-2">Descripción:</p>
-                <p className="text-gray-600">{selectedApartment.description}</p>
+              <div className="mb-4">
+                <p className="font-semibold mb-1 text-sm">Descripción:</p>
+                <p className="text-sm text-gray-600">{selectedApartment.description}</p>
               </div>
 
-              <div className="mb-6">
-                <p className="font-semibold mb-2">Características:</p>
-                <div className="flex flex-wrap gap-2">
+              <div className="mb-4">
+                <p className="font-semibold mb-1 text-sm">Características:</p>
+                <div className="flex flex-wrap gap-1.5">
                   {selectedApartment.features.map((feature, index) => (
                     <span 
                       key={index}
-                      className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm"
+                      className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full text-xs"
                     >
                       {feature}
                     </span>
@@ -384,12 +521,12 @@ const Search: React.FC<SearchProps> = ({
                 </div>
               </div>
 
-              <div className="flex gap-4 justify-end">
+              <div className="flex gap-3 justify-end border-t pt-3">
                 <button
                   onClick={() => handleViewDetails(selectedApartment.id)}
-                  className="text-purple-600 hover:text-purple-700 text-sm flex items-center gap-1"
+                  className="text-purple-600 hover:text-purple-700 text-xs sm:text-sm flex items-center gap-1"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
@@ -397,7 +534,7 @@ const Search: React.FC<SearchProps> = ({
                 </button>
                 <button
                   onClick={() => handleChatOpen(selectedApartment)}
-                  className="text-purple-600 hover:text-purple-700 text-sm flex items-center gap-1"
+                  className="text-purple-600 hover:text-purple-700 text-xs sm:text-sm flex items-center gap-1"
                 >
                   <FaComments className="text-sm" />
                   <span>Chatear</span>
