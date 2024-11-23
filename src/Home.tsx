@@ -9,6 +9,7 @@ import 'swiper/css/autoplay';
 import { Navigation, Pagination, Mousewheel, Autoplay } from 'swiper/modules';
 import { FaHeart, FaRegHeart, FaUser, FaComments, FaCog, FaSignOutAlt, FaHome } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { GoogleMap, useLoadScript, MarkerF } from '@react-google-maps/api';
 
 // Importar los datos de apartamentos y tipos
 import { apartments } from './data'; // Necesitarás crear este archivo
@@ -33,6 +34,18 @@ interface Message {
   timestamp: Date;
 }
 
+// Añade estas constantes fuera del componente
+const mapContainerStyle = {
+  width: '100%',
+  height: '100%',
+  borderRadius: '0.5rem'
+};
+
+const defaultCenter = {
+  lat: 37.3826,
+  lng: -5.9736
+};
+
 const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user, handleLogout, apartments, messages, onSendMessage }) => {
   const navigate = useNavigate();
   
@@ -49,6 +62,8 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [chatOrigin, setChatOrigin] = useState<'main' | 'detail' | null>(null);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Agregar las variables y funciones que faltan
   const locations = ["Centro de la ciudad", "Zona residencial", "Campus universitario"];
@@ -121,6 +136,11 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
   const handleViewDetails = (apartmentId: number) => {
     navigate(`/apartment/${apartmentId}`);
   };
+
+  // Dentro del componente Home, añade este hook
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: "TU_API_KEY_DE_GOOGLE_MAPS" // Necesitarás una API key de Google Maps
+  });
 
   return (
     <div className="min-h-screen bg-white">
@@ -248,20 +268,37 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
           </div>
           
           <div className="max-w-2xl mx-auto mb-4 sm:mb-6">
-            <button
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center gap-2 text-purple-600 hover:text-purple-700 mb-4"
-            >
-              <svg 
-                className={`w-5 h-5 transform transition-transform duration-200 ${isFilterOpen ? 'rotate-180' : ''}`} 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
+            <div className="flex items-center gap-4 mb-4">
+              <button
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                className="flex items-center gap-2 text-purple-600 hover:text-purple-700"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-              <span>Filtros</span>
-            </button>
+                <svg 
+                  className={`w-5 h-5 transform transition-transform duration-200 ${isFilterOpen ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+                <span>Filtros</span>
+              </button>
+
+              <button
+                onClick={() => setIsMapModalOpen(true)}
+                className="flex items-center gap-2 text-purple-600 hover:text-purple-700"
+              >
+                <svg 
+                  className="w-5 h-5" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                <span>Ver mapa</span>
+              </button>
+            </div>
 
             <div 
               className={`transform transition-all duration-300 ease-in-out origin-top ${
@@ -623,6 +660,225 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
                     >
                       Enviar
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isMapModalOpen && (
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setIsMapModalOpen(false);
+                }
+              }}
+            >
+              <div className="bg-white rounded-lg w-full h-[90vh] max-w-7xl relative animate-fadeIn">
+                {/* Header del modal */}
+                <div className="bg-purple-600 text-white p-4 rounded-t-lg flex justify-between items-center">
+                  <h3 className="font-semibold text-lg">Mapa de alojamientos</h3>
+                  <button 
+                    onClick={() => setIsMapModalOpen(false)}
+                    className="text-white hover:text-gray-200 transition-colors"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Contenido del modal */}
+                <div className="p-4 h-[calc(90vh-4rem)] flex gap-4">
+                  {/* Panel de filtros (30%) */}
+                  <div className="w-1/3 overflow-y-auto pr-4 border-r">
+                    {/* Barra de búsqueda */}
+                    <div className="mb-4">
+                      <div className="relative">
+                        <input
+                          type="search"
+                          placeholder="Buscar por nombre..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        />
+                        <svg 
+                          className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Filtros */}
+                    <div className="space-y-4">
+                      {/* Tipo de habitación */}
+                      <div>
+                        <h3 className="font-semibold mb-2">Tipo de habitación</h3>
+                        <select
+                          value={selectedCategory}
+                          onChange={(e) => setSelectedCategory(e.target.value)}
+                          className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                          <option value="">Todas</option>
+                          <option value="Studio">Estudio</option>
+                          <option value="1 Bedroom">1 Habitación</option>
+                          <option value="2 Bedroom">2 Habitaciones</option>
+                          <option value="3 Bedroom">3 Habitaciones</option>
+                        </select>
+                      </div>
+
+                      {/* Ubicación */}
+                      <div>
+                        <h3 className="font-semibold mb-2">Ubicación</h3>
+                        <select
+                          value={selectedLocation}
+                          onChange={(e) => setSelectedLocation(e.target.value)}
+                          className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                          <option value="">Todas las ubicaciones</option>
+                          {locations.map(location => (
+                            <option key={location} value={location}>{location}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Rango de precio */}
+                      <div>
+                        <h3 className="font-semibold mb-2">Rango de precio</h3>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            value={priceRange[0]}
+                            onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="Mín"
+                          />
+                          <span>-</span>
+                          <input
+                            type="number"
+                            value={priceRange[1]}
+                            onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="Máx"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Características */}
+                      <div>
+                        <h3 className="font-semibold mb-2">Características</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {allFeatures.map(feature => (
+                            <button
+                              key={feature}
+                              onClick={() => {
+                                setSelectedFeatures(prev =>
+                                  prev.includes(feature)
+                                    ? prev.filter(f => f !== feature)
+                                    : [...prev, feature]
+                                )
+                              }}
+                              className={`px-3 py-1 rounded-full text-sm ${
+                                selectedFeatures.includes(feature)
+                                  ? 'bg-purple-600 text-white'
+                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              }`}
+                            >
+                              {feature}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Resultados filtrados */}
+                      <div className="mt-6">
+                        <h3 className="font-semibold mb-3">Resultados</h3>
+                        <div className="space-y-3">
+                          {apartments
+                            .filter(apt => 
+                              (!searchTerm || apt.title.toLowerCase().includes(searchTerm.toLowerCase())) &&
+                              (!selectedCategory || apt.category === selectedCategory) &&
+                              (!selectedLocation || apt.location === selectedLocation) &&
+                              (apt.price >= priceRange[0] && apt.price <= priceRange[1]) &&
+                              (selectedFeatures.length === 0 || selectedFeatures.every(f => apt.features.includes(f)))
+                            )
+                            .map(apt => (
+                              <div 
+                                key={apt.id}
+                                className="p-3 border rounded-lg hover:border-purple-500 cursor-pointer transition-colors"
+                                onClick={() => handleApartmentClick(apt)}
+                              >
+                                <div className="flex gap-3">
+                                  <img 
+                                    src={apt.images[0]} 
+                                    alt={apt.title}
+                                    className="w-20 h-20 object-cover rounded-lg"
+                                  />
+                                  <div>
+                                    <h4 className="font-semibold text-gray-900">{apt.title}</h4>
+                                    <p className="text-sm text-gray-600">{apt.location}</p>
+                                    <p className="text-purple-600 font-medium">{apt.price}€/mes</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Mapa (70%) */}
+                  <div className="flex-1 bg-gray-100 rounded-lg">
+                    {!isLoaded ? (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+                      </div>
+                    ) : (
+                      <GoogleMap
+                        mapContainerStyle={mapContainerStyle}
+                        zoom={13}
+                        center={defaultCenter}
+                        options={{
+                          styles: [
+                            {
+                              featureType: "poi",
+                              elementType: "labels",
+                              stylers: [{ visibility: "off" }],
+                            },
+                          ],
+                          disableDefaultUI: true,
+                          zoomControl: true,
+                          mapTypeControl: false,
+                          streetViewControl: true,
+                          fullscreenControl: true,
+                        }}
+                      >
+                        {apartments
+                          .filter(apt => 
+                            (!searchTerm || apt.title.toLowerCase().includes(searchTerm.toLowerCase())) &&
+                            (!selectedCategory || apt.category === selectedCategory) &&
+                            (!selectedLocation || apt.location === selectedLocation) &&
+                            (apt.price >= priceRange[0] && apt.price <= priceRange[1]) &&
+                            (selectedFeatures.length === 0 || selectedFeatures.every(f => apt.features.includes(f)))
+                          )
+                          .map(apartment => (
+                            <MarkerF
+                              key={apartment.id}
+                              position={apartment.coordinates}
+                              onClick={() => handleApartmentClick(apartment)}
+                              icon={{
+                                url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                                scaledSize: new window.google.maps.Size(40, 40),
+                              }}
+                            />
+                          ))}
+                      </GoogleMap>
+                    )}
                   </div>
                 </div>
               </div>

@@ -31,6 +31,8 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
     confirmPassword: '',
   });
 
+  const [avatarPreview, setAvatarPreview] = useState(user.avatar);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -41,7 +43,13 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Aquí implementarías la lógica para subir la imagen
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      
+      // Aquí puedes agregar la lógica para subir la imagen al servidor
       console.log('Imagen seleccionada:', file);
     }
   };
@@ -74,7 +82,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           <div className="flex items-center gap-6 mb-8">
             <div className="relative">
               <img 
-                src={user.avatar} 
+                src={avatarPreview} 
                 alt={user.name}
                 className="w-24 h-24 rounded-full object-cover"
               />

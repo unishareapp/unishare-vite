@@ -4,6 +4,11 @@ export interface Apartment {
   category: string;
   price: number;
   location: string;
+  province: 'Cádiz' | 'Huelva' | 'Sevilla';
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
   size: string;
   description: string;
   features: string[];
@@ -19,7 +24,12 @@ export const apartments: Apartment[] = [
     category: "2 Bedroom",
     description: "Moderno apartamento completamente amueblado",
     price: 800,
-    location: "Centro ciudad",
+    location: "Alameda de Hércules",
+    province: "Sevilla",
+    coordinates: {
+      lat: 37.3991,
+      lng: -5.9928
+    },
     size: "75m²",
     images: [
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.0",
@@ -39,7 +49,12 @@ export const apartments: Apartment[] = [
     category: "Studio",
     description: "Estudio reformado con mucha luz natural",
     price: 600,
-    location: "Zona universitaria",
+    location: "Plaza de la Catedral",
+    province: "Cádiz",
+    coordinates: {
+      lat: 36.5297,
+      lng: -6.2929
+    },
     size: "40m²",
     images: [
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.0",
@@ -59,7 +74,12 @@ export const apartments: Apartment[] = [
     category: "Piso completo",
     description: "Amplio piso con mucha luz natural",
     price: 1200,
-    location: "Zona residencial",
+    location: "Barrio del Carmen",
+    province: "Huelva",
+    coordinates: {
+      lat: 37.2571,
+      lng: -6.9501
+    },
     size: "90m²",
     images: ["https://picsum.photos/seed/apt3/800/600"],
     features: ["WiFi", "Amueblado", "Terraza", "Parking"],
@@ -75,7 +95,12 @@ export const apartments: Apartment[] = [
     category: "Habitación",
     description: "Habitación individual en piso compartido",
     price: 350,
-    location: "Campus universitario",
+    location: "Nervión",
+    province: "Sevilla",
+    coordinates: {
+      lat: 37.3826,
+      lng: -5.9736
+    },
     size: "15m²",
     images: ["https://picsum.photos/seed/apt4/800/600"],
     features: ["WiFi", "Amueblado", "Lavandería"],
@@ -91,7 +116,12 @@ export const apartments: Apartment[] = [
     category: "Piso completo",
     description: "Espectacular ático con vistas a la ciudad",
     price: 1500,
-    location: "Centro de la ciudad",
+    location: "Plaza España",
+    province: "Cádiz",
+    coordinates: {
+      lat: 36.5270,
+      lng: -6.2885
+    },
     size: "75m²",
     images: ["https://picsum.photos/seed/apt5/800/600"],
     features: ["WiFi", "Amueblado", "Terraza", "Aire acondicionado"],
