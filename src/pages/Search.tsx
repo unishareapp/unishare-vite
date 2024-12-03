@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { FaHeart, FaRegHeart, FaComments, FaFilter, FaHome } from 'react-icons/fa';
 import { Apartment, Message, User } from '../types';
-import { apartments } from '../data';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
@@ -23,7 +22,6 @@ const Search: React.FC<SearchProps> = ({
   likedApartments, 
   handleLike, 
   openChat, 
-  onSendMessage, 
   messages, 
   user 
 }) => {
@@ -518,6 +516,27 @@ const Search: React.FC<SearchProps> = ({
                       {feature}
                     </span>
                   ))}
+                </div>
+              </div>
+
+              <div className="mb-4">
+                {/* Información del propietario */}
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <img 
+                    src={selectedApartment.user.avatar} 
+                    alt={selectedApartment.user.name}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-sm">{selectedApartment.user.name}</h3>
+                    <p className="text-xs text-gray-600">Propietario</p>
+                  </div>
+                  <button
+                    onClick={() => navigate(`/profile/${selectedApartment.user.id}`)}
+                    className="text-purple-600 hover:text-purple-700 text-sm font-medium"
+                  >
+                    Ver perfil
+                  </button>
                 </div>
               </div>
 

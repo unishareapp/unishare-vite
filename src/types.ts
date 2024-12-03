@@ -1,7 +1,11 @@
 export interface User {
+  id: string;
   name: string;
   avatar: string;
-  isLoggedIn: boolean;
+  bio?: string;
+  joinDate: Date;
+  rating: number;
+  reviewCount: number;
 }
 
 export interface Message {
@@ -23,7 +27,17 @@ export interface Apartment {
   features: string[];
   duration: string;
   user: {
+    id: string | undefined;
     name: string;
     avatar: string;
   };
+}
+
+export interface Review {
+  id: number;
+  rating: number;
+  comment: string;
+  author: string;
+  authorAvatar: string;
+  date: Date;
 } 

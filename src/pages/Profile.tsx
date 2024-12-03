@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaCamera, FaKey } from 'react-icons/fa';
+import { FaArrowLeft, FaCamera } from 'react-icons/fa';
 import { useState } from 'react';
 
 interface User {

@@ -39,9 +39,14 @@ function Register({ setUser }: RegisterProps) {
     }
 
     const newUser: User = {
+      id: 0,
       name: formData.username,
+      email: formData.email,
+      password: formData.password,
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${formData.username}`,
-      isLoggedIn: true
+      joinDate: new Date(),
+      rating: 0,
+      reviewCount: 0
     };
 
     setSuccess(true);

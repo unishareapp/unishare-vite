@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './Home';
 import Login from './Login';
@@ -13,13 +13,14 @@ import MyChats from './MyChats';
 import { apartments as initialApartments } from './data';
 import Register from './Register';
 import AddApartment from './pages/AddApartment';
+import UserProfile from './pages/UserProfile';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
   
   const [likedApartments, setLikedApartments] = useState<number[]>([]);
-  const [currentChatApartment, setCurrentChatApartment] = useState<Apartment | null>(null);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [setCurrentChatApartment] = useState<Apartment | null>(null);
+  const [setIsChatOpen] = useState(false);
   const [apartments, setApartments] = useState(initialApartments);
   const [messages, setMessages] = useState<{ [key: number]: Message[] }>({});
 
@@ -190,6 +191,10 @@ function App() {
                 onAddApartment={handleAddApartment}
               />
             } 
+          />
+          <Route 
+            path="/profile/:userId" 
+            element={<UserProfile apartments={apartments} />} 
           />
         </Routes>
       </div>

@@ -7,12 +7,10 @@ import 'swiper/css/pagination';
 import 'swiper/css/mousewheel';
 import 'swiper/css/autoplay';
 import { Navigation, Pagination, Mousewheel, Autoplay } from 'swiper/modules';
-import { FaHeart, FaRegHeart, FaUser, FaComments, FaCog, FaSignOutAlt, FaHome } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaComments, FaHome } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { GoogleMap, useLoadScript, MarkerF } from '@react-google-maps/api';
 
-// Importar los datos de apartamentos y tipos
-import { apartments } from './data'; // Necesitarás crear este archivo
 import { Apartment } from './types';
 
 interface HomeProps {
@@ -59,7 +57,6 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 3000]);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [selectedLocation, setSelectedLocation] = useState("");
-  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [chatOrigin, setChatOrigin] = useState<'main' | 'detail' | null>(null);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
@@ -75,10 +72,6 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
   // Funciones para manejar interacciones
   const handleApartmentClick = (apartment: Apartment) => {
     setSelectedApartment(apartment);
-  };
-
-  const closeModal = () => {
-    setSelectedApartment(null);
   };
 
   const handleSendMessage = (apartmentId: number) => {
@@ -133,13 +126,10 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
     }
   };
 
-  const handleViewDetails = (apartmentId: number) => {
-    navigate(`/apartment/${apartmentId}`);
-  };
 
   // Dentro del componente Home, añade este hook
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "TU_API_KEY_DE_GOOGLE_MAPS" // Necesitarás una API key de Google Maps
+    googleMapsApiKey: "TU_API_KEY_AQUÍ"
   });
 
   return (
