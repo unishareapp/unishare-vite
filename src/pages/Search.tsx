@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { FaHeart, FaRegHeart, FaComments, FaFilter, FaHome } from 'react-icons/fa';
 import { Apartment, Message, User } from '../types';
@@ -6,6 +6,9 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import { api } from '../api/config';
+import Room from '../components/RoomModal';
+import SearchFilters, { SearchFilters as FilterTypes } from '../components/SearchFilters';
 
 interface SearchProps {
   apartments: Apartment[];
@@ -30,6 +33,17 @@ const Search: React.FC<SearchProps> = ({
   const searchQuery = searchParams.get('q') || '';
   const [selectedApartment, setSelectedApartment] = useState<Apartment | null>(null);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState<FilterTypes>({
+    priceRange: [0, 2000],
+    province: '',
+    roomType: '',
+    furnished: false,
+    petsAllowed: false,
+    utilities: [],
+    availability: '',
+    sortBy: 'recent'
+  });
   
   // Inicializar filtros desde URL
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || "");
@@ -110,6 +124,56 @@ const Search: React.FC<SearchProps> = ({
       return;
     }
     openChat(apartment);
+  };
+
+  useEffect(() => {
+    const fetchApartments = async () => {
+      try {
+        const data = await api.get('/apartments');
+        setApartments(data);
+      } catch (error) {
+        console.error('Error al cargar los apartamentos');
+      }
+    };
+
+    fetchApartments();
+  }, []);
+
+  // Función para aplicar filtros
+  const filteredApartments = apartments.filter(apt => {
+    const matchesSearch = apt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         apt.location.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesPrice = apt.price >= priceRange[0] && apt.price <= priceRange[1];
+    const matchesFeatures = selectedFeatures.length === 0 || 
+                           selectedFeatures.every(f => apt.features.includes(f));
+
+    return matchesSearch && matchesPrice && matchesFeatures;
+  });
+
+  const handleFilterChange = (filters: FilterTypes) => {
+    setAdvancedFilters(filters);
+    // Aplicar filtros a los resultados
+    const filtered = apartments.filter(apartment => {
+      const matchesPrice = apartment.price >= filters.priceRange[0] && 
+                          apartment.price <= filters.priceRange[1];
+      const matchesProvince = !filters.province || 
+                             apartment.province === filters.province;
+      const matchesRoomType = !filters.roomType || 
+                             apartment.roomType === filters.roomType;
+      // ... aplicar otros filtros ...
+
+      return matchesPrice && matchesProvince && matchesRoomType;
+    });
+
+    // Ordenar resultados
+    if (filters.sortBy === 'price_asc') {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (filters.sortBy === 'price_desc') {
+      filtered.sort((a, b) => b.price - a.price);
+    }
+    // ... otros tipos de ordenamiento ...
+
+    setFilteredApartments(filtered);
   };
 
   return (
@@ -260,55 +324,21 @@ const Search: React.FC<SearchProps> = ({
 
             {/* Grid de resultados */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredResults.map((apartment) => (
-                <div 
+              {filteredApartments.map((apartment) => (
+                <Room
                   key={apartment.id}
-                  className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => handleApartmentClick(apartment)}
-                >
-                  <Swiper
-                    navigation={true}
-                    modules={[Navigation]}
-                    loop={true}
-                    className="h-40 sm:h-48"
-                  >
-                    {apartment.images.map((image, index) => (
-                      <SwiperSlide key={index}>
-                        <img 
-                          src={image} 
-                          alt={apartment.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
-
-                  <div className="p-3">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-base font-semibold line-clamp-1">{apartment.title}</h3>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleLike(apartment.id);
-                        }}
-                        className="text-purple-600 hover:text-purple-700"
-                      >
-                        {likedApartments.includes(apartment.id) ? (
-                          <FaHeart className="text-lg" />
-                        ) : (
-                          <FaRegHeart className="text-lg" />
-                        )}
-                      </button>
-                    </div>
-                    
-                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">{apartment.description}</p>
-                    
-                    <div className="flex justify-between items-center">
-                      <p className="text-purple-600 font-semibold">{apartment.price}€/mes</p>
-                      <p className="text-sm text-gray-500">{apartment.location}</p>
-                    </div>
-                  </div>
-                </div>
+                  id={apartment.id}
+                  image={apartment.images[0]}
+                  title={apartment.title}
+                  companions={apartment.companions}
+                  utilities={apartment.utilities}
+                  dates={apartment.dates}
+                  price={apartment.price}
+                  carouselImages={apartment.images}
+                  location={apartment.location}
+                  info1={apartment.description}
+                  info2={apartment.additionalInfo}
+                />
               ))}
             </div>
           </div>

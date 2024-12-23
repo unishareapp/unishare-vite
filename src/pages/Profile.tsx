@@ -1,211 +1,162 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaCamera } from 'react-icons/fa';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { api } from '../api/config';
 
-interface User {
+interface UserProfile {
+  id: string;
   name: string;
-  avatar: string;
-  isLoggedIn: boolean;
   email: string;
+  avatar?: string;
+  // Añade más campos según necesites
 }
 
-interface ProfileProps {
-  user: User | null;
-}
-
-const Profile: React.FC<ProfileProps> = ({ user }) => {
-  const navigate = useNavigate();
-  
-  if (!user) {
-    navigate('/login');
-    return null;
-  }
-
+export default function Profile() {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: user.name,
-    email: user.email,
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+    name: '',
+    email: '',
   });
 
-  const [avatarPreview, setAvatarPreview] = useState(user.avatar);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await api.get(`/users/${user?.id}`);
+        setProfile(data);
+        setFormData({
+          name: data.name,
+          email: data.email,
+        });
+      } catch (error) {
+        console.error('Error al cargar el perfil:', error);
+      }
+    };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-      
-      // Aquí puedes agregar la lógica para subir la imagen al servidor
-      console.log('Imagen seleccionada:', file);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const updatedProfile = await api.put(`/users/${user?.id}`, formData);
+      setProfile(updatedProfile);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error al actualizar el perfil:', error);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Aquí implementarías la lógica para guardar los cambios
-    console.log('Guardando cambios:', formData);
-    setIsEditing(false);
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && user) {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      try {
+        const response = await fetch(`http://localhost:3001/api/users/${user.id}/avatar`, {
+          method: 'PUT',
+          body: formData,
+        });
+        const updatedUser = await response.json();
+        setProfile(prev => prev ? { ...prev, avatar: updatedUser.avatar } : null);
+      } catch (error) {
+        console.error('Error al subir la imagen:', error);
+      }
+    }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white">
-        <div className="container mx-auto px-4 py-3">
-          <button 
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-purple-600 hover:text-purple-700"
-          >
-            <FaArrowLeft />
-            <span>Volver</span>
-          </button>
-        </div>
-      </header>
+  if (!profile) {
+    return <div>Cargando...</div>;
+  }
 
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-8 text-purple-800">Tu Perfil</h1>
-        
-        <div className="max-w-2xl mx-auto">
-          <div className="flex items-center gap-6 mb-8">
-            <div className="relative">
-              <img 
-                src={avatarPreview} 
-                alt={user.name}
-                className="w-24 h-24 rounded-full object-cover"
+  return (
+    <div className="max-w-4xl mx-auto p-4">
+      <div className="bg-white shadow rounded-lg p-6">
+        <div className="flex items-center space-x-6 mb-4">
+          <div className="relative">
+            <img
+              src={profile.avatar || 'https://via.placeholder.com/150'}
+              alt="Profile"
+              className="w-24 h-24 rounded-full object-cover"
+            />
+            <label className="absolute bottom-0 right-0 bg-indigo-600 rounded-full p-2 cursor-pointer">
+              <input
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageUpload}
               />
-              <label className="absolute bottom-0 right-0 bg-purple-600 p-2 rounded-full text-white cursor-pointer hover:bg-purple-700">
-                <FaCamera className="w-4 h-4" />
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 text-white"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+            </label>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold">{profile.name}</h2>
+            <p className="text-gray-600">{profile.email}</p>
+          </div>
+        </div>
+
+        {isEditing ? (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Nombre
               </label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-800">{user.name}</h2>
-              <p className="text-gray-600">{user.email}</p>
+              <label className="block text-sm font-medium text-gray-700">
+                Email
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              />
             </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Información del perfil</h3>
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(!isEditing)}
-                  className="text-purple-600 hover:text-purple-700"
-                >
-                  {isEditing ? 'Cancelar' : 'Editar'}
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nombre
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className="w-full px-4 py-2 rounded-lg border bg-gray-50 disabled:opacity-75"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className="w-full px-4 py-2 rounded-lg border bg-gray-50 disabled:opacity-75"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-              <h3 className="text-lg font-semibold mb-4">Cambiar contraseña</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Contraseña actual
-                  </label>
-                  <input
-                    type="password"
-                    name="currentPassword"
-                    value={formData.currentPassword}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className="w-full px-4 py-2 rounded-lg border bg-gray-50 disabled:opacity-75"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nueva contraseña
-                  </label>
-                  <input
-                    type="password"
-                    name="newPassword"
-                    value={formData.newPassword}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className="w-full px-4 py-2 rounded-lg border bg-gray-50 disabled:opacity-75"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Confirmar nueva contraseña
-                  </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className="w-full px-4 py-2 rounded-lg border bg-gray-50 disabled:opacity-75"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {isEditing && (
+            <div className="flex space-x-4">
               <button
                 type="submit"
-                className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
               >
                 Guardar cambios
               </button>
-            )}
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+              >
+                Cancelar
+              </button>
+            </div>
           </form>
-        </div>
+        ) : (
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            >
+              Editar perfil
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default Profile; 
+} 

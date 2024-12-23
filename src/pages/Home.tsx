@@ -11,7 +11,7 @@ import { FaHeart, FaRegHeart, FaComments, FaHome } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { GoogleMap, useLoadScript, MarkerF } from '@react-google-maps/api';
 
-import { Apartment } from './types';
+import { Apartment } from '../types';
 
 interface HomeProps {
   likedApartments: number[];

@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { apartments } from '../data';
 import { FaHeart, FaRegHeart, FaComments, FaArrowLeft } from 'react-icons/fa';
 import { Apartment } from '../types';
+import { api } from '../api/config';
+import Review from '../components/Review';
+import ReviewList from '../components/ReviewList';
 
 // Importar los componentes necesarios para el chat
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import ChatWindow from '../components/ChatWindow';
 
 interface ApartmentDetailProps {
   apartments: Apartment[];
@@ -41,6 +45,31 @@ const ApartmentDetail: React.FC<ApartmentDetailProps> = ({
   const [currentMessage, setCurrentMessage] = useState("");
   const [isImageSliderOpen, setIsImageSliderOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [reviews, setReviews] = useState([]);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const data = await api.get(`/apartments/${id}/reviews`);
+        setReviews(data);
+      } catch (error) {
+        console.error('Error al cargar reseñas:', error);
+      }
+    };
+
+    if (id) {
+      fetchReviews();
+    }
+  }, [id]);
+
+  const handleReviewSubmitted = async () => {
+    // Recargar reseñas después de enviar una nueva
+    const data = await api.get(`/apartments/${id}/reviews`);
+    setReviews(data);
+    setShowReviewForm(false);
+  };
 
   const handleChatOpen = (apartment: Apartment) => {
     if (!user) {
@@ -76,6 +105,14 @@ const ApartmentDetail: React.FC<ApartmentDetailProps> = ({
       });
     } else {
       navigate('/');
+    }
+  };
+
+  const handleContact = () => {
+    if (user) {
+      setShowChat(true);
+    } else {
+      navigate('/login');
     }
   };
 
@@ -162,11 +199,11 @@ const ApartmentDetail: React.FC<ApartmentDetailProps> = ({
                   <span>Guardar</span>
                 </button>
                 <button
-                  onClick={() => handleChatOpen(apartment)}
+                  onClick={handleContact}
                   className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 flex items-center gap-2"
                 >
                   <FaComments />
-                  <span>Chatear con {apartment.user.name}</span>
+                  <span>Contactar con {apartment.user.name}</span>
                 </button>
               </div>
             </div>
@@ -201,6 +238,16 @@ const ApartmentDetail: React.FC<ApartmentDetailProps> = ({
                   }}
                 />
               ))}
+            </div>
+          </div>
+
+          <div className="p-6">
+            <div className="mt-4 flex justify-end">
+              <ReportButton
+                targetId={apartment.id}
+                targetType="apartment"
+                className="text-sm"
+              />
             </div>
           </div>
         </div>
@@ -330,6 +377,40 @@ const ApartmentDetail: React.FC<ApartmentDetailProps> = ({
             </Swiper>
           </div>
         </div>
+      )}
+
+      <div className="mt-8 bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Reseñas</h2>
+          
+          {user && !showReviewForm && (
+            <button
+              onClick={() => setShowReviewForm(true)}
+              className="mb-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Escribir una reseña
+            </button>
+          )}
+
+          {showReviewForm && (
+            <div className="mb-6">
+              <Review
+                apartmentId={parseInt(id!)}
+                onReviewSubmitted={handleReviewSubmitted}
+              />
+            </div>
+          )}
+
+          <ReviewList reviews={reviews} />
+        </div>
+      </div>
+
+      {showChat && (
+        <ChatWindow
+          receiverId={apartment.user.id}
+          receiverName={apartment.user.name}
+          onClose={() => setShowChat(false)}
+        />
       )}
     </div>
   );
