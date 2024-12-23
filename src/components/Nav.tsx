@@ -9,17 +9,10 @@ export default function Navbar() {
     <nav className="bg-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between h-16">
-          <div className="flex">
-            <Link to="/" className="flex items-center">
-              <span className="text-xl font-bold">UniShare</span>
-            </Link>
-          </div>
+        
 
           <div className="flex items-center space-x-4">
-            <Link to="/search" className="text-gray-700 hover:text-gray-900">
-              Buscar
-            </Link>
-
+            
             {user ? (
               <>
                 <Link to="/add-apartment" className="text-gray-700 hover:text-gray-900">

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../supabaseClient'; // Asegúrate de que la ruta sea correcta
 
 export default function Register() {
   const [name, setName] = useState('');

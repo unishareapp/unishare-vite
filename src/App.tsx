@@ -16,6 +16,8 @@ import Footer from './components/Footer';
 import AdminPanel from './pages/AdminPanel';
 import { ChatProvider } from './contexts/ChatContext';
 import NotificationPrompt from './components/NotificationPrompt';
+import { NotificationProvider } from './contexts/NotificationContext';
+import Home from './pages/Home';
 // Importa tus otros componentes
 
 function App() {

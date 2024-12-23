@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import './App.css';
+import React, { useEffect, useState } from 'react'
+import '../App.css';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -9,7 +9,7 @@ import 'swiper/css/autoplay';
 import { Navigation, Pagination, Mousewheel, Autoplay } from 'swiper/modules';
 import { FaHeart, FaRegHeart, FaComments, FaHome } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { GoogleMap, useLoadScript, MarkerF } from '@react-google-maps/api';
+import { supabase } from '../supabaseClient'; 
 
 import { Apartment } from '../types';
 
@@ -44,10 +44,11 @@ const defaultCenter = {
   lng: -5.9736
 };
 
-const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user, handleLogout, apartments, messages, onSendMessage }) => {
+const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user, handleLogout, apartments: initialApartments, messages, onSendMessage }) => {
   const navigate = useNavigate();
   
   // Declarar todos los estados necesarios
+  const [apartments, setApartments] = useState<Apartment[]>(initialApartments);
   const [selectedCategory, setSelectedCategory] = useState("")
   const [selectedApartment, setSelectedApartment] = useState<Apartment | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -126,11 +127,21 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
     }
   };
 
+  useEffect(() => {
+    const fetchApartments = async () => {
+      const { data, error } = await supabase
+        .from('apartments') // Nombre de la tabla
+        .select('*'); // Selecciona todos los campos
 
-  // Dentro del componente Home, añade este hook
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "TU_API_KEY_AQUÍ"
-  });
+      if (error) {
+        console.error('Error fetching apartments:', error);
+      } else {
+        setApartments(data);
+      }
+    };
+
+    fetchApartments();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -405,56 +416,7 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
               }}
               className="apartment-swiper px-2 sm:px-0"
             >
-              {featuredApartments.map(apt => (
-                <SwiperSlide key={apt.id}>
-                  <div 
-                    className="bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer transition-transform hover:scale-105 h-full flex flex-col"
-                    onClick={() => handleApartmentClick(apt)}
-                  >
-                    <div className="h-36 flex-shrink-0">
-                      <img 
-                        src={apt.images[0]} 
-                        alt={apt.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="p-3 flex-grow">
-                      <div className="flex items-center gap-2 mb-2">
-                        <img 
-                          src={apt.user.avatar} 
-                          alt={apt.user.name}
-                          className="w-6 h-6 rounded-full object-cover"
-                        />
-                        <span className="text-sm text-gray-600">{apt.user.name}</span>
-                      </div>
-                      <h2 className="text-lg font-semibold truncate">{apt.title}</h2>
-                      <p className="text-gray-600 text-sm mb-1 truncate">{apt.category}</p>
-                      <p className="text-base font-bold text-purple-600">{apt.price}€/mes</p>
-                    </div>
-                    <div className="bg-gray-50 p-2 flex justify-between items-center">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleLikeWithAuth(apt.id);
-                        }}
-                        className="text-lg text-red-500 hover:text-red-600 transition-colors"
-                      >
-                        {likedApartments.includes(apt.id) ? <FaHeart /> : <FaRegHeart />}
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleChatOpen(apt, 'main');
-                        }}
-                        className="bg-purple-600 text-white px-2 py-1 rounded text-xs hover:bg-purple-700 transition-colors flex items-center gap-1"
-                      >
-                        <FaComments className="text-sm" />
-                        <span>Chatear</span>
-                      </button>
-                    </div>
-                  </div>
-                </SwiperSlide>
-              ))}
+             
             </Swiper>
           </div>
 

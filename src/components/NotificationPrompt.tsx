@@ -30,7 +30,7 @@ export default function NotificationPrompt() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 max-w-sm bg-white rounded-lg shadow-lg p-6">
+    <div className="fixed bottom-4 right-4 max-w-sm bg-white rounded-lg shadow-lg p-6 z-50">
       <div className="flex items-start">
         <div className="flex-shrink-0">
           <svg
