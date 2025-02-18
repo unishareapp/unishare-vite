@@ -15,8 +15,7 @@ import Privacy from './pages/Privacy';
 import Footer from './components/Footer';
 import AdminPanel from './pages/AdminPanel';
 import { ChatProvider } from './contexts/ChatContext';
-import NotificationPrompt from './components/NotificationPrompt';
-import { NotificationProvider } from './contexts/NotificationContext';
+
 import Home from './pages/Home';
 // Importa tus otros componentes
 
@@ -24,7 +23,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <NotificationProvider>
+   
           <ChatProvider>
             <div className="min-h-screen bg-gray-50">
               <Navbar />
@@ -81,10 +80,10 @@ function App() {
                 {/* <Route path="/search" element={<Search />} /> */}
               </Routes>
               <Footer />
-              <NotificationPrompt />
+              
             </div>
           </ChatProvider>
-        </NotificationProvider>
+        
       </AuthProvider>
     </BrowserRouter>
   );

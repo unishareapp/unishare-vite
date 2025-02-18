@@ -10,6 +10,7 @@ import { Navigation, Pagination, Mousewheel, Autoplay } from 'swiper/modules';
 import { FaHeart, FaRegHeart, FaComments, FaHome } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient'; 
+import { api } from '../api/config';
 
 import { Apartment } from '../types';
 
@@ -44,11 +45,10 @@ const defaultCenter = {
   lng: -5.9736
 };
 
-const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user, handleLogout, apartments: initialApartments, messages, onSendMessage }) => {
+const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user, handleLogout, apartments, messages, onSendMessage }) => {
   const navigate = useNavigate();
   
   // Declarar todos los estados necesarios
-  const [apartments, setApartments] = useState<Apartment[]>(initialApartments);
   const [selectedCategory, setSelectedCategory] = useState("")
   const [selectedApartment, setSelectedApartment] = useState<Apartment | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -67,8 +67,6 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
   const locations = ["Centro de la ciudad", "Zona residencial", "Campus universitario"];
   const allFeatures = ["Amueblado", "WiFi", "Gimnasio", "Lavandería", "Terraza", "Parking"];
 
-  // Mostrar todos los apartamentos en destacados sin filtrar
-  const featuredApartments = apartments;
 
   // Funciones para manejar interacciones
   const handleApartmentClick = (apartment: Apartment) => {
@@ -129,19 +127,19 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
 
   useEffect(() => {
     const fetchApartments = async () => {
-      const { data, error } = await supabase
-        .from('apartments') // Nombre de la tabla
-        .select('*'); // Selecciona todos los campos
-
-      if (error) {
-        console.error('Error fetching apartments:', error);
-      } else {
-        setApartments(data);
+      try {
+        const response = await api.get('/apartments'); // Asegúrate de que esta ruta sea correcta
+        setApartments(response.data);
+      } catch (error) {
+        console.error('Error al cargar los apartamentos:', error);
       }
     };
 
     fetchApartments();
   }, []);
+
+  // Mostrar todos los apartamentos en destacados sin filtrar
+  const featuredApartments = apartments; // Aquí se asignan todos los apartamentos
 
   return (
     <div className="min-h-screen bg-white">
@@ -391,33 +389,24 @@ const Home: React.FC<HomeProps> = ({ likedApartments, handleLike, openChat, user
 
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-purple-800 mb-4">Alojamientos destacados</h2>
-            <Swiper
-              navigation={true}
-              modules={[Navigation, Mousewheel, Autoplay]}
-              mousewheel={{
-                forceToAxis: true,
-                sensitivity: 1,
-                releaseOnEdges: true
-              }}
-              autoplay={{
-                delay: 5000,
-                disableOnInteraction: false,
-                pauseOnMouseEnter: true
-              }}
-              loop={true}
-              spaceBetween={10}
-              slidesPerView={1.2}
-              breakpoints={{
-                480: { slidesPerView: 1.5, spaceBetween: 15 },
-                640: { slidesPerView: 2, spaceBetween: 20 },
-                768: { slidesPerView: 2.5 },
-                1024: { slidesPerView: 3 },
-                1280: { slidesPerView: 4 },
-              }}
-              className="apartment-swiper px-2 sm:px-0"
-            >
-             
-            </Swiper>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {featuredApartments.map((apartment) => (
+                <Room
+                  key={apartment.id}
+                  id={apartment.id}
+                  image={apartment.images[0]}
+                  title={apartment.title}
+                  companions={apartment.companions}
+                  utilities={apartment.utilities}
+                  dates={apartment.dates}
+                  price={apartment.price}
+                  carouselImages={apartment.images}
+                  location={apartment.location}
+                  info1={apartment.description}
+                  info2={apartment.additionalInfo}
+                />
+              ))}
+            </div>
           </div>
 
           {selectedApartment && (
